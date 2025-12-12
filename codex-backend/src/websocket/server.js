@@ -27,24 +27,31 @@ function initializeWebSocket(server) {
       message: 'Connected to Black Codex WebSocket server'
     }));
 
+    // Try authenticate from query param token if present
+    try {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const token = url.searchParams.get('token');
+      if (token) {
+        // perform authentication
+        handleAuthenticate(clientId, token);
+      }
+    } catch (e) {
+      // ignore URL parse errors
+    }
+
     ws.on('message', (message) => {
       try {
         const data = JSON.parse(message);
         handleMessage(clientId, data);
       } catch (error) {
         logger.error('WebSocket message error:', error);
-        ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format' }));
-      function emitDeviceDiscovered(device) {
-        broadcast('device.discovered', device);
-      function emitPortOpen({ ip, port, service, banner }) {
-        broadcast('port.open', { ip, port, service, banner });
-      }
-      }
+        try {
+          ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format' }));
+        } catch (e) {
+          logger.error('Failed to send error message to client', e);
+        }
       }
     });
-        emitPortOpen,
-
-        emitDeviceDiscovered,
     ws.on('close', () => {
       clients.delete(clientId);
       logger.info(`WebSocket client disconnected: ${clientId}`);
@@ -109,23 +116,23 @@ function handleSubscribe(clientId, channel) {
   const client = clients.get(clientId);
   if (!client) return;
 
-  const validChannels = ['alerts', 'devices', 'scans', 'packets', 'system'];
+  const validChannels = ['alerts', 'devices', 'scan', 'scans', 'packets', 'system'];
+  const protectedChannels = new Set(['devices', 'scans', 'packets', 'system']);
 
   if (!validChannels.includes(channel)) {
-    client.ws.send(JSON.stringify({
-      type: 'error',
-      message: `Invalid channel: ${channel}`
-    }));
+    client.ws.send(JSON.stringify({ type: 'error', message: `Invalid channel: ${channel}` }));
+    return;
+  }
+
+  // Require authentication for protected channels
+  if (protectedChannels.has(channel) && !client.authenticated) {
+    client.ws.send(JSON.stringify({ type: 'error', message: `Authentication required to subscribe to ${channel}` }));
+    logger.warn(`Client ${clientId} denied subscription to protected channel ${channel}`);
     return;
   }
 
   client.subscriptions.add(channel);
-  client.ws.send(JSON.stringify({
-    type: 'subscribed',
-    channel,
-    message: `Subscribed to ${channel}`
-  }));
-
+  client.ws.send(JSON.stringify({ type: 'subscribed', channel, message: `Subscribed to ${channel}` }));
   logger.info(`Client ${clientId} subscribed to ${channel}`);
 }
 
@@ -152,13 +159,16 @@ function broadcast(channel, data) {
     timestamp: new Date().toISOString()
   });
 
+  const protectedChannels = new Set(['devices', 'scans', 'packets', 'system']);
+
   clients.forEach((client, clientId) => {
-    if (client.subscriptions.has(channel) && client.ws.readyState === WebSocket.OPEN) {
-      try {
-        client.ws.send(message);
-      } catch (error) {
-        logger.error(`Failed to send to client ${clientId}:`, error);
-      }
+    // If channel is protected, only send to authenticated clients
+    if (!client.subscriptions.has(channel) || client.ws.readyState !== WebSocket.OPEN) return;
+    if (protectedChannels.has(channel) && !client.authenticated) return;
+    try {
+      client.ws.send(message);
+    } catch (error) {
+      logger.error(`Failed to send to client ${clientId}:`, error);
     }
   });
 }

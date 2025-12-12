@@ -10,7 +10,9 @@ const dns = require('dns');
 const os = require('os');
 const { promisify } = require('util');
 const { v4: uuidv4 } = require('uuid');
-const { getDatabase, saveDatabase } = require('../database/init');
+const { checkCredentials, auditMisconfigurations } = require('./credentialChecker');
+const { getDeviceCVEs } = require('./cveLookup');
+const { getDatabase } = require('../database/init');
 const logger = require('../utils/logger');
 
 const execAsync = promisify(exec);
@@ -410,10 +412,10 @@ function getNetworkInfo() {
 function calculateSubnet(ip, netmask) {
   const ipParts = ip.split('.').map(Number);
   const maskParts = netmask.split('.').map(Number);
-  
+
   const networkParts = ipParts.map((part, i) => part & maskParts[i]);
   const network = networkParts.join('.');
-  
+
   // Calculate CIDR
   let cidr = 0;
   for (const part of maskParts) {
@@ -423,7 +425,7 @@ function calculateSubnet(ip, netmask) {
       bits >>= 1;
     }
   }
-  
+
   return `${network}/${cidr}`;
 }
 
@@ -436,10 +438,10 @@ function getIPRange(subnet) {
   const maskBits = parseInt(cidr, 10);
   const hostBits = 32 - maskBits;
   const numHosts = Math.pow(2, hostBits) - 2;
-  
+
   const ips = [];
   const baseNum = (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
-  
+
   for (let i = 1; i <= Math.min(numHosts, 254); i++) {
     const ipNum = baseNum + i;
     const ip = [
@@ -450,7 +452,7 @@ function getIPRange(subnet) {
     ].join('.');
     ips.push(ip);
   }
-  
+
   return ips;
 }
 
@@ -468,7 +470,7 @@ function lookupVendor(mac) {
  */
 function detectDeviceType(vendor, openPorts) {
   const vendorLower = vendor.toLowerCase();
-  
+
   // Vendor-based detection
   if (vendorLower.includes('hikvision') || vendorLower.includes('dahua') || vendorLower.includes('axis')) {
     return 'camera';
@@ -486,7 +488,7 @@ function detectDeviceType(vendor, openPorts) {
     if (openPorts.includes(9100) || openPorts.includes(631)) return 'printer';
   }
   if (vendorLower.includes('espressif') || vendorLower.includes('esp')) return 'iot_device';
-  
+
   // Port-based detection
   for (const [type, ports] of Object.entries(DEVICE_SIGNATURES)) {
     const matchCount = openPorts.filter(p => ports.includes(p)).length;
@@ -494,18 +496,18 @@ function detectDeviceType(vendor, openPorts) {
       return type;
     }
   }
-  
+
   // Single port detection
   if (openPorts.includes(554) || openPorts.includes(8554)) return 'camera';
   if (openPorts.includes(9100)) return 'printer';
   if (openPorts.includes(5000) || openPorts.includes(5001)) return 'nas';
   if (openPorts.includes(1883) || openPorts.includes(8883)) return 'iot_hub';
-  
+
   // Default based on common router ports at gateway
   if (openPorts.includes(80) && openPorts.includes(443)) {
     if (openPorts.includes(53) || openPorts.includes(67)) return 'router';
   }
-  
+
   return 'unknown';
 }
 
@@ -518,12 +520,12 @@ async function arpScan() {
 
   try {
     let output;
-    
+
     if (platform === 'win32') {
       // Windows: Use arp -a
       const { stdout } = await execAsync('arp -a', { encoding: 'utf8' });
       output = stdout;
-      
+
       // Parse Windows ARP output
       const lines = output.split('\n');
       for (const line of lines) {
@@ -533,7 +535,7 @@ async function arpScan() {
           const ip = match[1];
           const mac = match[2].replace(/-/g, ':').toUpperCase();
           const type = match[3];
-          
+
           if (type === 'dynamic' || type === 'static') {
             devices.push({ ip, mac, type });
           }
@@ -544,7 +546,7 @@ async function arpScan() {
       try {
         const { stdout } = await execAsync('arp -a', { encoding: 'utf8' });
         output = stdout;
-        
+
         const lines = output.split('\n');
         for (const line of lines) {
           // Linux format: hostname (IP) at MAC [ether] on interface
@@ -562,7 +564,7 @@ async function arpScan() {
         // Try ip neighbor for Linux
         const { stdout } = await execAsync('ip neighbor', { encoding: 'utf8' });
         output = stdout;
-        
+
         const lines = output.split('\n');
         for (const line of lines) {
           const match = line.match(/(\d+\.\d+\.\d+\.\d+)\s+dev\s+\w+\s+lladdr\s+([0-9a-fA-F:]{17})/);
@@ -590,7 +592,7 @@ async function arpScan() {
  */
 async function pingHost(ip, timeout = 1000) {
   const platform = os.platform();
-  
+
   try {
     let cmd;
     if (platform === 'win32') {
@@ -598,9 +600,9 @@ async function pingHost(ip, timeout = 1000) {
     } else {
       cmd = `ping -c 1 -W ${Math.ceil(timeout / 1000)} ${ip}`;
     }
-    
+
     const { stdout } = await execAsync(cmd, { encoding: 'utf8', timeout: timeout + 1000 });
-    
+
     // Check for successful ping
     if (platform === 'win32') {
       return stdout.includes('TTL=') || stdout.includes('ttl=');
@@ -653,19 +655,19 @@ function scanPort(ip, port, timeout = 500) {
  */
 async function scanPorts(ip, ports = QUICK_SCAN_PORTS, concurrency = 10) {
   const openPorts = [];
-  
+
   // Scan in batches for better performance
   for (let i = 0; i < ports.length; i += concurrency) {
     const batch = ports.slice(i, i + concurrency);
     const results = await Promise.all(batch.map(port => scanPort(ip, port)));
-    
+
     for (const result of results) {
       if (result.open) {
         openPorts.push(result.port);
       }
     }
   }
-  
+
   return openPorts;
 }
 
@@ -727,7 +729,7 @@ function getServiceName(port) {
     37777: 'Dahua-DVR',
     37778: 'Dahua-DVR'
   };
-  
+
   return services[port] || `Port-${port}`;
 }
 
@@ -774,7 +776,7 @@ async function grabBanner(ip, port, timeout = 3000) {
   return new Promise((resolve, reject) => {
     const isHttps = [443, 8443].includes(port);
     const protocol = isHttps ? require('https') : require('http');
-    
+
     const options = {
       hostname: ip,
       port: port,
@@ -795,7 +797,7 @@ async function grabBanner(ip, port, timeout = 3000) {
         contentType: res.headers['content-type'] || null,
         headers: {}
       };
-      
+
       // Capture interesting headers
       const interestingHeaders = ['www-authenticate', 'x-frame-options', 'x-aspnet-version', 'x-server'];
       for (const header of interestingHeaders) {
@@ -813,7 +815,7 @@ async function grabBanner(ip, port, timeout = 3000) {
           res.destroy(); // Don't read too much
         }
       });
-      
+
       res.on('end', () => {
         // Try to extract title from HTML
         const titleMatch = body.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -822,7 +824,7 @@ async function grabBanner(ip, port, timeout = 3000) {
         }
         resolve(banner);
       });
-      
+
       res.on('error', () => resolve(banner));
     });
 
@@ -859,32 +861,32 @@ async function getHostname(ip) {
  */
 function calculateRiskScore(device) {
   let score = 0;
-  
+
   // Dangerous ports
   const dangerousPorts = [23, 21, 7547, 37777, 34567];
   const foundDangerous = device.openPorts.filter(p => dangerousPorts.includes(p));
   score += foundDangerous.length * 20;
-  
+
   // Open management ports without encryption
   if (device.openPorts.includes(80) && !device.openPorts.includes(443)) {
     score += 10;
   }
-  
+
   // Unknown vendor
   if (device.vendor === 'Unknown' || device.vendor === 'Unknown Vendor') {
     score += 15;
   }
-  
+
   // Camera with RTSP
   if (device.deviceType === 'camera' && device.openPorts.includes(554)) {
     score += 25;
   }
-  
+
   // Many open ports
   if (device.openPorts.length > 5) {
     score += 10;
   }
-  
+
   return Math.min(score, 100);
 }
 
@@ -906,9 +908,9 @@ async function fullNetworkScan(subnet, progressCallback) {
   const db = getDatabase();
   const devices = [];
   const now = new Date().toISOString();
-  
+
   logger.info(`Starting full network scan on ${subnet || 'auto-detected network'}`);
-  
+
   // Get network info if subnet not specified
   if (!subnet) {
     const networkInfo = getNetworkInfo();
@@ -920,16 +922,16 @@ async function fullNetworkScan(subnet, progressCallback) {
       logger.info(`Using default subnet: ${subnet}`);
     }
   }
-  
+
   // Step 1: ARP scan for quick device discovery
   if (progressCallback) progressCallback(5, 'Running ARP scan...');
   const arpDevices = await arpScan();
-  
+
   // Step 2: Also ping sweep the subnet for devices not in ARP cache
   if (progressCallback) progressCallback(15, 'Running ping sweep...');
   const ipRange = getIPRange(subnet);
   const discoveredIPs = new Set(arpDevices.map(d => d.ip));
-  
+
   // Ping unknown IPs (limited to avoid long scans)
   const unknownIPs = ipRange.filter(ip => !discoveredIPs.has(ip)).slice(0, 50);
   const pingResults = await Promise.all(
@@ -938,35 +940,35 @@ async function fullNetworkScan(subnet, progressCallback) {
       return alive ? ip : null;
     })
   );
-  
+
   // Add pinged devices
   for (const ip of pingResults.filter(Boolean)) {
     if (!discoveredIPs.has(ip)) {
       arpDevices.push({ ip, mac: null, type: 'ping' });
     }
   }
-  
+
   const totalDevices = arpDevices.length;
   logger.info(`Found ${totalDevices} potential devices`);
-  
+
   // Step 3: Scan each device
   for (let i = 0; i < arpDevices.length; i++) {
     const arpDevice = arpDevices[i];
     const progress = 20 + Math.floor((i / totalDevices) * 70);
-    
+
     if (progressCallback) {
       progressCallback(progress, `Scanning ${arpDevice.ip}...`);
     }
-    
+
     try {
       // Port scan
       const openPorts = await scanPorts(arpDevice.ip, QUICK_SCAN_PORTS);
-      
+
       // Get vendor and device type
       const vendor = lookupVendor(arpDevice.mac);
       const deviceType = detectDeviceType(vendor, openPorts);
       const hostname = await getHostname(arpDevice.ip);
-      
+
       const device = {
         id: uuidv4(),
         ip: arpDevice.ip,
@@ -980,16 +982,16 @@ async function fullNetworkScan(subnet, progressCallback) {
         discoveredAt: now,
         lastSeen: now
       };
-      
+
       // Calculate risk
       device.riskScore = calculateRiskScore(device);
       device.riskLevel = getRiskLevel(device.riskScore);
-      
+
       devices.push(device);
-      
+
       // Save to database
       const existing = db.prepare('SELECT id FROM devices WHERE ip = ?').get(device.ip);
-      
+
       if (existing) {
         // Update existing device
         db.prepare(`
@@ -1038,7 +1040,7 @@ async function fullNetworkScan(subnet, progressCallback) {
           now,
           now
         );
-        
+
         // Create alert for new device
         db.prepare(`
           INSERT INTO alerts (id, type, severity, device_id, device_ip, device_mac, message, created_at)
@@ -1052,7 +1054,7 @@ async function fullNetworkScan(subnet, progressCallback) {
           now
         );
       }
-      
+
       // Save ports
       for (const port of device.openPorts) {
         db.prepare(`
@@ -1060,24 +1062,24 @@ async function fullNetworkScan(subnet, progressCallback) {
           VALUES (?, ?, ?, ?, 'open')
         `).run(uuidv4(), device.id, port, getServiceName(port));
       }
-      
+
       // Check for vulnerabilities
       await checkDeviceVulnerabilities(device);
-      
+
     } catch (error) {
       logger.error(`Error scanning ${arpDevice.ip}:`, error.message);
     }
   }
-  
+
   if (progressCallback) progressCallback(95, 'Finalizing scan...');
-  
+
   // Save database
   saveDatabase();
-  
+
   if (progressCallback) progressCallback(100, 'Scan complete');
-  
+
   logger.info(`Scan complete. Found ${devices.length} devices.`);
-  
+
   return {
     devices,
     summary: {
@@ -1099,7 +1101,7 @@ async function checkDeviceVulnerabilities(device) {
   const db = getDatabase();
   const now = new Date().toISOString();
   const vulns = [];
-  
+
   // Telnet open
   if (device.openPorts.includes(23)) {
     vulns.push({
@@ -1111,7 +1113,7 @@ async function checkDeviceVulnerabilities(device) {
       remediation: 'Disable Telnet and use SSH for secure remote access.'
     });
   }
-  
+
   // FTP open
   if (device.openPorts.includes(21)) {
     vulns.push({
@@ -1123,7 +1125,7 @@ async function checkDeviceVulnerabilities(device) {
       remediation: 'Use SFTP or SCP for secure file transfer.'
     });
   }
-  
+
   // TR-069/CWMP (ISP remote management)
   if (device.openPorts.includes(7547)) {
     // Persist scan snapshot
@@ -1131,10 +1133,10 @@ async function checkDeviceVulnerabilities(device) {
     db.prepare(`
       INSERT INTO scans (id, type, status, started_at, completed_at, devices_scanned)
       VALUES (?, 'incremental', 'completed', ?, ?, ?)
-    `).run(scanId, now, now, discoveredDevices.length);
+    `).run(scanId, now, now, 1); // fixed: discoveredDevices.length not available in this scope, passed 1
 
   }
-  
+
   // TP-Link router vulnerabilities
   if (device.vendor.includes('TP-Link') && device.deviceType === 'router') {
     vulns.push({
@@ -1146,7 +1148,7 @@ async function checkDeviceVulnerabilities(device) {
       remediation: 'Update router firmware to latest version.'
     });
   }
-  
+
   // UPnP enabled
   if (device.openPorts.includes(1900)) {
     vulns.push({
@@ -1158,7 +1160,7 @@ async function checkDeviceVulnerabilities(device) {
       remediation: 'Disable UPnP if not required.'
     });
   }
-  
+
   // HTTP without HTTPS
   if (device.openPorts.includes(80) && !device.openPorts.includes(443)) {
     vulns.push({
@@ -1170,13 +1172,13 @@ async function checkDeviceVulnerabilities(device) {
       remediation: 'Enable HTTPS on the device if supported.'
     });
   }
-  
+
   // Save vulnerabilities to database
   for (const vuln of vulns) {
     const existing = db.prepare(
       'SELECT id FROM vulnerabilities WHERE device_id = ? AND title = ?'
     ).get(device.id, vuln.title);
-    
+
     if (!existing) {
       db.prepare(`
         INSERT INTO vulnerabilities (id, device_id, title, severity, description, cve_id, cvss_score, remediation, status, discovered_at)
@@ -1192,7 +1194,7 @@ async function checkDeviceVulnerabilities(device) {
         vuln.remediation,
         now
       );
-      
+
       // Create alert for critical/high vulns
       if (vuln.severity === 'critical' || vuln.severity === 'high') {
         db.prepare(`
@@ -1209,7 +1211,35 @@ async function checkDeviceVulnerabilities(device) {
       }
     }
   }
-  
+
+  // Lookup real CVEs from NVD
+  try {
+    const liveCves = await getDeviceCVEs(device);
+    if (liveCves && liveCves.length > 0) {
+      logger.info(`[NVD] Found ${liveCves.length} CVEs for ${device.vendor} ${device.deviceType}`);
+      for (const cve of liveCves) {
+        const existing = db.prepare('SELECT id FROM vulnerabilities WHERE device_id = ? AND cve_id = ?').get(device.id, cve.id);
+        if (!existing) {
+          db.prepare(`
+                      INSERT INTO vulnerabilities (id, device_id, title, severity, description, cve_id, cvss_score, remediation, status, discovered_at)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open', ?)
+                  `).run(
+            uuidv4(), device.id, cve.id,
+            cve.cvssSeverity || 'medium',
+            cve.description || `Vulnerability ${cve.id}`,
+            cve.id,
+            cve.cvssScore || 5.0,
+            'Check vendor updates',
+            now
+          );
+          vulns.push({ title: cve.id, severity: cve.cvssSeverity });
+        }
+      }
+    }
+  } catch (err) {
+    logger.error(`[NVD] Failed during scan lookup: ${err.message}`);
+  }
+
   return vulns;
 }
 
@@ -1219,28 +1249,28 @@ async function checkDeviceVulnerabilities(device) {
  */
 async function quickDiscovery() {
   const arpDevices = await arpScan();
-  
+
   // Filter out broadcast, multicast, and link-local addresses
   const filteredDevices = arpDevices.filter(d => {
     // Filter out broadcast MAC
     if (d.mac === 'FF:FF:FF:FF:FF:FF') return false;
-    
+
     // Filter out multicast MAC (starts with 01:00:5E for IPv4 multicast)
     if (d.mac.startsWith('01:00:5E')) return false;
-    
+
     // Filter out broadcast IPs
     if (d.ip.endsWith('.255')) return false;
-    
+
     // Filter out multicast IPs (224.x.x.x - 239.x.x.x)
     const firstOctet = parseInt(d.ip.split('.')[0]);
     if (firstOctet >= 224 && firstOctet <= 239) return false;
-    
+
     // Filter out link-local (169.254.x.x)
     if (d.ip.startsWith('169.254.')) return false;
-    
+
     return true;
   });
-  
+
   return filteredDevices.map(d => ({
     ip: d.ip,
     mac: d.mac,
@@ -1257,7 +1287,7 @@ async function quickDiscovery() {
  */
 async function scanDevicePorts(ip, ports = IOT_PORTS) {
   const openPorts = await scanPorts(ip, ports, 20);
-  
+
   return openPorts.map(port => ({
     port,
     service: getServiceName(port),
@@ -1271,42 +1301,42 @@ async function scanDevicePorts(ip, ports = IOT_PORTS) {
  */
 async function performInitialScan() {
   logger.info('[InitialScan] Starting real network discovery...');
-  
+
   try {
     const db = getDatabase();
     if (!db) {
       logger.error('[InitialScan] Database not available');
       return { success: false, deviceCount: 0 };
     }
-    
+
     // Clear existing devices (remove demo data)
     db.prepare('DELETE FROM devices').run();
     db.prepare('DELETE FROM ports').run();
     db.prepare('DELETE FROM vulnerabilities').run();
     db.prepare('DELETE FROM alerts').run();
     logger.info('[InitialScan] Cleared old data');
-    
+
     // Perform real ARP scan
     const discoveredDevices = await quickDiscovery();
     logger.info(`[InitialScan] Discovered ${discoveredDevices.length} devices via ARP`);
-    
+
     const now = new Date().toISOString();
     let insertedCount = 0;
-    
+
     for (const device of discoveredDevices) {
       try {
         const deviceId = uuidv4();
         const deviceType = detectDeviceType(device.vendor, []);
-        
+
         // Determine risk level based on device type
         let riskLevel = 'low';
         let riskScore = 20;
-        
+
         if (device.vendor === 'Unknown Vendor' || device.vendor === 'Unknown') {
           riskLevel = 'medium';
           riskScore = 50;
         }
-        
+
         // Insert real device into database
         db.prepare(`
           INSERT INTO devices (id, name, ip, mac, device_type, manufacturer, status, risk_score, risk_level, discovered_at, last_seen, created_at)
@@ -1325,7 +1355,7 @@ async function performInitialScan() {
           now,
           now
         );
-        
+
         // Create alert for new device discovery
         db.prepare(`
           INSERT INTO alerts (id, type, severity, device_id, device_ip, device_mac, message, created_at)
@@ -1340,28 +1370,28 @@ async function performInitialScan() {
           `New device discovered: ${device.vendor} at ${device.ip}`,
           now
         );
-        
+
         insertedCount++;
         logger.info(`[InitialScan] Added device: ${device.ip} (${device.vendor})`);
-        
+
       } catch (err) {
         logger.error(`[InitialScan] Error inserting device ${device.ip}:`, err.message);
       }
     }
-    
+
     // Save database
     if (typeof db.save === 'function') {
       db.save();
     }
-    
+
     logger.info(`[InitialScan] Complete: ${insertedCount} real devices added to database`);
-    
+
     return {
       success: true,
       deviceCount: insertedCount,
       devices: discoveredDevices
     };
-    
+
   } catch (err) {
     logger.error('[InitialScan] Error:', err.message);
     return { success: false, deviceCount: 0, error: err.message };
@@ -1373,20 +1403,20 @@ async function performInitialScan() {
  */
 async function refreshDevices() {
   logger.info('[RefreshDevices] Starting network refresh...');
-  
+
   const db = getDatabase();
   if (!db) return { success: false };
-  
+
   const discoveredDevices = await quickDiscovery();
   const now = new Date().toISOString();
-  
+
   // Get existing devices
   const existingDevices = db.prepare('SELECT * FROM devices').all();
   const existingIPs = new Set(existingDevices.map(d => d.ip));
-  
+
   let newCount = 0;
   let updatedCount = 0;
-  
+
   for (const device of discoveredDevices) {
     if (existingIPs.has(device.ip)) {
       // Update existing device
@@ -1414,7 +1444,7 @@ async function refreshDevices() {
         now,
         now
       );
-      
+
       // Alert for new device
       db.prepare(`
         INSERT INTO alerts (id, type, severity, device_id, device_ip, message, created_at)
@@ -1428,17 +1458,17 @@ async function refreshDevices() {
         `NEW DEVICE DETECTED: ${device.vendor} at ${device.ip}`,
         now
       );
-      
+
       newCount++;
     }
   }
-  
+
   // Mark devices not seen as offline
   const discoveredIPs = new Set(discoveredDevices.map(d => d.ip));
   for (const existing of existingDevices) {
     if (!discoveredIPs.has(existing.ip) && existing.status === 'online') {
       db.prepare(`UPDATE devices SET status = 'offline' WHERE ip = ?`).run(existing.ip);
-      
+
       // Alert for offline device
       db.prepare(`
         INSERT INTO alerts (id, type, severity, device_id, device_ip, message, created_at)
@@ -1454,11 +1484,11 @@ async function refreshDevices() {
       );
     }
   }
-  
+
   if (typeof db.save === 'function') {
     db.save();
   }
-  
+
   return { success: true, newDevices: newCount, updatedDevices: updatedCount };
 }
 

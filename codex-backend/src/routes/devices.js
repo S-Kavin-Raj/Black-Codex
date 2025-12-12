@@ -34,7 +34,7 @@ router.get('/', optionalAuth, (req, res) => {
   try {
     const db = getDatabase();
     const { status, type, risk_level, search } = req.query;
-    
+
     let query = 'SELECT * FROM devices WHERE 1=1';
     const params = [];
 
@@ -59,7 +59,7 @@ router.get('/', optionalAuth, (req, res) => {
     query += ' ORDER BY risk_score DESC, last_seen DESC';
 
     const devices = db.prepare(query).all(...params);
-    
+
     // Parse JSON fields
     const parsedDevices = devices.map(device => ({
       ...device,
@@ -80,20 +80,20 @@ router.get('/:id', authenticate, (req, res) => {
   try {
     const db = getDatabase();
     const device = db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
-    
+
     if (!device) {
       return res.status(404).json({ error: 'Device not found' });
     }
 
     // Get vulnerabilities
     const vulnerabilities = db.prepare('SELECT * FROM vulnerabilities WHERE device_id = ?').all(req.params.id);
-    
+
     // Get ports
     const ports = db.prepare('SELECT * FROM ports WHERE device_id = ?').all(req.params.id);
-    
+
     // Get misconfigurations
     const misconfigurations = db.prepare('SELECT * FROM misconfigurations WHERE device_id = ?').all(req.params.id);
-    
+
     // Get anomalies
     const anomalies = db.prepare('SELECT * FROM anomalies WHERE device_id = ? ORDER BY created_at DESC LIMIT 10').all(req.params.id);
 
@@ -177,7 +177,7 @@ router.put('/:id', authenticate, (req, res) => {
   try {
     const db = getDatabase();
     const device = db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
-    
+
     if (!device) {
       return res.status(404).json({ error: 'Device not found' });
     }
@@ -218,13 +218,13 @@ router.delete('/:id', authenticate, (req, res) => {
   try {
     const db = getDatabase();
     const device = db.prepare('SELECT * FROM devices WHERE id = ?').get(req.params.id);
-    
+
     if (!device) {
       return res.status(404).json({ error: 'Device not found' });
     }
 
     db.prepare('DELETE FROM devices WHERE id = ?').run(req.params.id);
-    
+
     logAudit(req.user.id, 'DEVICE_DELETED', 'device', req.params.id, { name: device.name, ip: device.ip }, req);
 
     // Emit alert for quarantine
@@ -264,15 +264,15 @@ router.delete('/:id', authenticate, (req, res) => {
 router.get('/stats/summary', authenticate, (req, res) => {
   try {
     const db = getDatabase();
-    
+
     const total = db.prepare('SELECT COUNT(*) as count FROM devices').get().count;
     const online = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'online'").get().count;
     const offline = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'offline'").get().count;
     const quarantined = db.prepare("SELECT COUNT(*) as count FROM devices WHERE is_quarantined = 1").get().count;
-    
+
     const byType = db.prepare('SELECT type, COUNT(*) as count FROM devices GROUP BY type').all();
     const byRiskLevel = db.prepare('SELECT risk_level, COUNT(*) as count FROM devices GROUP BY risk_level').all();
-    
+
     const criticalDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'critical'").get().count;
     const highRiskDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'high'").get().count;
 
@@ -308,7 +308,7 @@ router.post('/:ip/check-credentials', optionalAuth, async (req, res) => {
 
   // Require explicit authorization flag
   if (!authorized) {
-    return res.status(403).json({ 
+    return res.status(403).json({
       error: 'Authorization required',
       message: 'Credential checks are intrusive. Set { authorized: true } to confirm you have permission to test this device.'
     });
@@ -316,7 +316,7 @@ router.post('/:ip/check-credentials', optionalAuth, async (req, res) => {
 
   try {
     const db = getDatabase();
-    
+
     // Find device
     const device = db.prepare('SELECT * FROM devices WHERE ip = ?').get(ip);
     if (!device) {
@@ -361,7 +361,7 @@ router.post('/:ip/check-credentials', optionalAuth, async (req, res) => {
 
     // Update device record
     const hasWeakCredentials = results.weakCredentialsFound || results.defaultCredentialsFound;
-    
+
     db.prepare(`
       UPDATE devices 
       SET has_weak_credentials = ?, 
@@ -384,7 +384,7 @@ router.post('/:ip/check-credentials', optionalAuth, async (req, res) => {
     // If critical findings, create alert and broadcast
     if (hasWeakCredentials) {
       const alertId = uuidv4();
-      const alertMessage = results.defaultCredentialsFound 
+      const alertMessage = results.defaultCredentialsFound
         ? `Default credentials detected on ${device.name || ip}`
         : `Weak security configuration on ${device.name || ip}`;
 
@@ -420,7 +420,7 @@ router.post('/:ip/check-credentials', optionalAuth, async (req, res) => {
       // Update device risk score
       const newRiskScore = Math.min(100, (device.risk_score || 0) + 30);
       const newRiskLevel = newRiskScore >= 80 ? 'critical' : newRiskScore >= 60 ? 'high' : newRiskScore >= 40 ? 'medium' : 'low';
-      
+
       db.prepare(`
         UPDATE devices SET risk_score = ?, risk_level = ? WHERE ip = ?
       `).run(newRiskScore, newRiskLevel, ip);
@@ -473,7 +473,7 @@ router.get('/:ip/config-audit', optionalAuth, async (req, res) => {
 
   try {
     const db = getDatabase();
-    
+
     // Find device
     const device = db.prepare('SELECT * FROM devices WHERE ip = ?').get(ip);
     if (!device) {
@@ -709,17 +709,27 @@ router.post('/:ip/quarantine', authenticate, async (req, res) => {
     if (!device) return res.status(404).json({ error: 'Device not found' });
     // Model A: Local firewall
     const exec = require('child_process').exec;
-    // Try iptables first
-    exec(`iptables -A INPUT -s ${ip} -j DROP`, (err) => {
-      if (err) {
-        // Try ufw
-        exec(`ufw deny from ${ip} to any`, (ufwErr) => {
-          if (ufwErr) {
-            return res.status(500).json({ error: 'Failed to quarantine device', details: err.message });
-          }
-        });
-      }
-    });
+    const isWindows = process.platform === 'win32';
+
+    if (isWindows) {
+      // Windows Firewall (netsh)
+      exec(`netsh advfirewall firewall add rule name="Block ${ip}" dir=in action=block remoteip=${ip}`, (err) => {
+        if (err) logger.error(`Failed to add Windows firewall rule for ${ip}: ${err.message}`);
+      });
+      exec(`netsh advfirewall firewall add rule name="Block ${ip}" dir=out action=block remoteip=${ip}`, (err) => {
+        if (err) logger.error(`Failed to add Windows firewall rule for ${ip}: ${err.message}`);
+      });
+    } else {
+      // Linux (iptables/ufw)
+      exec(`iptables -A INPUT -s ${ip} -j DROP`, (err) => {
+        if (err) {
+          // Try ufw
+          exec(`ufw deny from ${ip} to any`, (ufwErr) => {
+            if (ufwErr) logger.error(`Failed to add Linux firewall rule for ${ip}: ${ufwErr.message}`);
+          });
+        }
+      });
+    }
     // Mark device as quarantined
     db.prepare('UPDATE devices SET status = ?, is_quarantined = 1, quarantine_reason = ?, quarantined_at = ? WHERE ip = ?')
       .run('quarantined', reason, new Date().toISOString(), ip);
@@ -744,12 +754,22 @@ router.post('/:ip/unquarantine', authenticate, async (req, res) => {
     const db = getDatabase();
     const device = db.prepare('SELECT * FROM devices WHERE ip = ?').get(ip);
     if (!device) return res.status(404).json({ error: 'Device not found' });
-    // Remove iptables rule
+    // Remove firewall rule
     const exec = require('child_process').exec;
-    exec(`iptables -D INPUT -s ${ip} -j DROP`, (err) => {
-      // Remove ufw rule
-      exec(`ufw delete deny from ${ip} to any`, () => {});
-    });
+    const isWindows = process.platform === 'win32';
+
+    if (isWindows) {
+      // Windows Firewall (netsh)
+      exec(`netsh advfirewall firewall delete rule name="Block ${ip}"`, (err) => {
+        if (err) logger.error(`Failed to remove Windows firewall rule for ${ip}: ${err.message}`);
+      });
+    } else {
+      // Linux (iptables/ufw)
+      exec(`iptables -D INPUT -s ${ip} -j DROP`, (err) => {
+        // Remove ufw rule
+        exec(`ufw delete deny from ${ip} to any`, () => { });
+      });
+    }
     db.prepare('UPDATE devices SET status = ?, is_quarantined = 0, quarantine_reason = NULL, quarantined_at = NULL WHERE ip = ?')
       .run('online', ip);
     logAudit(req.user.id, 'DEVICE_UNQUARANTINED', 'device', device.id, { ip }, req);

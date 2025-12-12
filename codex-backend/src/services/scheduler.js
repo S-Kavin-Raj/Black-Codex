@@ -52,7 +52,7 @@ function startScheduledTasks() {
             if ([80, 443, 8080, 8443].includes(portInfo.port)) {
               try {
                 banner = await grabBanner(device.ip, portInfo.port);
-              } catch {}
+              } catch { }
             }
             emit.portOpen({
               ip: device.ip,
@@ -81,6 +81,31 @@ function startScheduledTasks() {
   });
   scheduledTasks.push(auditCleanup);
 
+  // Update threat intelligence every 6 hours
+  const threatUpdate = cron.schedule('0 */6 * * *', async () => {
+    try {
+      const { fetchRecentThreats, fetchCISAExploits } = require('./threatFeed');
+      logger.info('Starting scheduled threat feed update...');
+      await fetchRecentThreats();
+      await fetchCISAExploits();
+    } catch (err) {
+      logger.error('Threat feed update error:', err);
+    }
+  });
+  scheduledTasks.push(threatUpdate);
+
+  // Run immediately on startup (async)
+  setTimeout(async () => {
+    try {
+      const { fetchRecentThreats, fetchCISAExploits } = require('./threatFeed');
+      logger.info('Performing startup threat feed update...');
+      await fetchRecentThreats();
+      await fetchCISAExploits();
+    } catch (err) {
+      logger.error('Startup threat feed update error:', err);
+    }
+  }, 10000);
+
   logger.info('Scheduled tasks started');
 }
 
@@ -105,7 +130,7 @@ function checkQuarantineReleases() {
 
     for (const device of devicesToRelease) {
       const newStatus = device.previous_status || 'online';
-      
+
       db.prepare(`
         UPDATE devices SET 
           status = ?,
@@ -203,19 +228,19 @@ function generateDailyDigest() {
       newDevices: db.prepare(`
         SELECT COUNT(*) as count FROM devices WHERE discovered_at >= ?
       `).get(yesterday).count,
-      
+
       newVulnerabilities: db.prepare(`
         SELECT COUNT(*) as count FROM vulnerabilities WHERE discovered_at >= ?
       `).get(yesterday).count,
-      
+
       alertsCreated: db.prepare(`
         SELECT COUNT(*) as count FROM alerts WHERE created_at >= ?
       `).get(yesterday).count,
-      
+
       scansCompleted: db.prepare(`
         SELECT COUNT(*) as count FROM scans WHERE started_at >= ? AND status = 'completed'
       `).get(yesterday).count,
-      
+
       criticalAlerts: db.prepare(`
         SELECT COUNT(*) as count FROM alerts 
         WHERE created_at >= ? AND severity = 'critical' AND acknowledged = 0

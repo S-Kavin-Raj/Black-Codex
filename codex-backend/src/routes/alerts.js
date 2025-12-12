@@ -108,8 +108,8 @@ router.post('/', authenticate, [
 
     const alert = db.prepare('SELECT * FROM alerts WHERE id = ?').get(alertId);
 
-    // Broadcast to WebSocket clients
-    broadcast('alert:new', alert);
+    // Broadcast to WebSocket clients on the standardized 'alerts' channel
+    broadcast('alerts', { event: 'new_alert', alert });
 
     res.status(201).json(alert);
   } catch (error) {
@@ -137,8 +137,8 @@ router.put('/:id/acknowledge', authenticate, (req, res) => {
 
     const updatedAlert = db.prepare('SELECT * FROM alerts WHERE id = ?').get(req.params.id);
     
-    // Broadcast update
-    broadcast('alert:updated', updatedAlert);
+    // Broadcast update on the 'alerts' channel
+    broadcast('alerts', { event: 'alert_acknowledged', alert: updatedAlert, alertId: updatedAlert.id });
 
     res.json(updatedAlert);
   } catch (error) {
@@ -175,6 +175,9 @@ router.post('/acknowledge-bulk', authenticate, [
     transaction();
 
     logAudit(req.user.id, 'ALERTS_BULK_ACKNOWLEDGED', 'alert', null, { count: alertIds.length }, req);
+
+    // Broadcast bulk acknowledgement
+    broadcast('alerts', { event: 'bulk_acknowledged', alertIds, count: alertIds.length });
 
     res.json({ message: `${alertIds.length} alerts acknowledged` });
   } catch (error) {

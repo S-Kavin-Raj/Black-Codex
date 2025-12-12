@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const https = require('https');
 const { initializeDatabase, saveDatabase } = require('./database/init');
 const { initializeWebSocket } = require('./websocket/server');
 const { startScheduledTasks } = require('./services/scheduler');
@@ -33,10 +35,12 @@ const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
-  credentials: true
-}));
+// Configure CORS: allow a comma-separated list in CORS_ORIGIN or defaults
+const defaultOrigins = ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'];
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()).filter(Boolean)
+  : defaultOrigins;
+app.use(cors({ origin: corsOrigins, credentials: true }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -55,8 +59,8 @@ app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     service: 'Black Codex Backend'
@@ -85,8 +89,8 @@ app.use('/api/security', securityRoutes);
 app.use((err, req, res, next) => {
   logger.error(`Error: ${err.message}`, { stack: err.stack });
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
+    error: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
       : err.message
   });
 });
@@ -111,11 +115,25 @@ async function startServer() {
       logger.error('Initial scan failed:', err.message);
     });
 
-    // Start HTTP server
-    const server = app.listen(PORT, () => {
-      logger.info(`Black Codex Backend running on port ${PORT}`);
-      logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
+    // Start HTTP or HTTPS server depending on environment
+    let server;
+    const keyPath = process.env.SSL_KEY_PATH;
+    const certPath = process.env.SSL_CERT_PATH;
+
+    if (keyPath && certPath && fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+      const key = fs.readFileSync(keyPath);
+      const cert = fs.readFileSync(certPath);
+      server = https.createServer({ key, cert }, app).listen(PORT, () => {
+        logger.info(`Black Codex Backend (HTTPS) running on port ${PORT}`);
+        logger.info(`Environment: ${process.env.NODE_ENV || 'production'}`);
+      });
+    } else {
+      server = app.listen(PORT, () => {
+        logger.info(`Black Codex Backend (HTTP) running on port ${PORT}`);
+        logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        if (!keyPath || !certPath) logger.warn('SSL cert/key not provided — running without TLS');
+      });
+    }
 
     // Initialize WebSocket server
     initializeWebSocket(server);

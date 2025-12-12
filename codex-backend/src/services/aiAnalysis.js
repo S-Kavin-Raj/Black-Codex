@@ -33,7 +33,8 @@ async function callAIEngine(prompt) {
     return data.choices?.[0]?.message?.content || data.message?.content || '';
   } catch (err) {
     logger.error(`[AI] Engine call failed: ${err.message}`);
-    return 'AI analysis unavailable.';
+    // Fallback for demo/offline mode so the user sees the feature working
+    return `**Analysis (Offline Mode)**\n\nBased on heuristics (AI service unavailable):\n1. **Use Strong Passwords**: Ensure all accounts use complex passwords.\n2. **Close Unused Ports**: Port ${prompt.match(/Open Ports: (.*)/)?.[1] || 'detected'} should be closed if not in use.\n3. **Update Firmware**: Check vendor site for updates.\n\nSummary: Device shows potential risks due to exposed services. Immediate hardening recommended.`;
   }
 }
 

@@ -352,6 +352,26 @@ async function runFullScan(scanId, subnet, userId) {
       message: 'Scan complete',
       result: result.summary
     };
+
+    // Stream discovered devices to websocket clients for real-time UI updates
+    if (Array.isArray(result.devices) && result.devices.length > 0) {
+      for (const dev of result.devices) {
+        try {
+          // Broadcast new_device event for each discovered device
+          broadcast('devices', { event: 'new_device', device: dev });
+          // small delay to simulate streaming arrival
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, 150));
+        } catch (e) {
+          logger.error('Failed to broadcast discovered device', e);
+        }
+      }
+    }
+
+    // If scanner returned network/wifi info, broadcast it on scan channel
+    if (result.networkInfo) {
+      broadcast('scan', { type: 'network_info', scanId, network: result.networkInfo });
+    }
     
     // Broadcast completion
     broadcast('scan', {

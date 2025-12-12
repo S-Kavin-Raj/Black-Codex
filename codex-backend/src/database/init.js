@@ -63,7 +63,7 @@ function wrapDatabase(sqlJsDb) {
         throw err;
       }
     },
-    pragma: () => {},
+    pragma: () => { },
     _db: sqlJsDb,
     save: () => {
       const data = sqlJsDb.export();
@@ -81,14 +81,14 @@ function getDatabase() {
 async function initializeDatabase() {
   const dbPath = process.env.DATABASE_PATH || './data/codex.db';
   const dbDir = path.dirname(dbPath);
-  
+
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
   }
-  
+
   // Initialize SQL.js
   SQL = await initSqlJs();
-  
+
   // Load existing database or create new one
   let sqlJsDb;
   if (fs.existsSync(dbPath)) {
@@ -97,9 +97,9 @@ async function initializeDatabase() {
   } else {
     sqlJsDb = new SQL.Database();
   }
-  
+
   db = wrapDatabase(sqlJsDb);
-  
+
   // Create tables
   db.exec(`
     -- Users table
@@ -129,6 +129,8 @@ async function initializeDatabase() {
       status TEXT DEFAULT 'online',
       risk_score INTEGER DEFAULT 0,
       risk_level TEXT DEFAULT 'safe',
+      risk_level TEXT DEFAULT 'safe',
+      first_seen TEXT DEFAULT CURRENT_TIMESTAMP,
       last_seen TEXT,
       discovered_at TEXT DEFAULT CURRENT_TIMESTAMP,
       admin_url TEXT,
@@ -191,6 +193,7 @@ async function initializeDatabase() {
       device_ip TEXT,
       device_mac TEXT,
       message TEXT NOT NULL,
+      title TEXT,
       details TEXT,
       acknowledged INTEGER DEFAULT 0,
       acknowledged_by TEXT,
@@ -276,8 +279,10 @@ async function initializeDatabase() {
       description TEXT,
       indicators TEXT,
       affected_device_types TEXT,
+      mitigation_steps TEXT,
       status TEXT DEFAULT 'active',
       first_seen TEXT,
+      last_seen TEXT,
       last_active TEXT,
       source TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -468,7 +473,7 @@ async function initializeDatabase() {
 
   // Seed default admin user if not exists
   const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get(process.env.ADMIN_EMAIL || 'admin@blackcodex.local');
-  
+
   if (!adminExists) {
     const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'ChangeMe123!', 10);
     db.prepare(`
