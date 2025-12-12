@@ -3,7 +3,11 @@ const { getDatabase } = require('../database/init');
 const { authenticate } = require('../middleware/auth');
 const logger = require('../utils/logger');
 
+const { getNetworkTraffic } = require('../services/realNetworkScanner');
+
 const router = express.Router();
+
+// ... existing routes ...
 
 // Get network topology
 router.get('/topology', authenticate, (req, res) => {
@@ -193,32 +197,20 @@ router.get('/segments', authenticate, (req, res) => {
   }
 });
 
-// Get bandwidth usage (simulated)
-router.get('/bandwidth', authenticate, (req, res) => {
+// Get real real-time network traffic
+router.get('/bandwidth', authenticate, async (req, res) => {
   try {
+    const stats = await getNetworkTraffic();
     const db = getDatabase();
-    const devices = db.prepare("SELECT * FROM devices WHERE status = 'online'").all();
-
-    // Simulate bandwidth data
-    const bandwidthData = devices.map(device => ({
-      deviceId: device.id,
-      deviceName: device.name,
-      ip: device.ip,
-      download: Math.random() * 100, // Mbps
-      upload: Math.random() * 50, // Mbps
-      totalToday: Math.random() * 1000, // MB
-      avgLatency: Math.random() * 50 + 5 // ms
-    }));
-
-    const totalDownload = bandwidthData.reduce((sum, d) => sum + d.download, 0);
-    const totalUpload = bandwidthData.reduce((sum, d) => sum + d.upload, 0);
+    // Get active connection count for context
+    const activeCount = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'online'").get().count;
 
     res.json({
-      devices: bandwidthData,
+      devices: [], // Per-device traffic requires packet inspection driver
       summary: {
-        totalDownload: totalDownload.toFixed(2),
-        totalUpload: totalUpload.toFixed(2),
-        activeConnections: devices.length
+        totalDownload: (stats.received / 1024 / 1024).toFixed(2), // MB
+        totalUpload: (stats.sent / 1024 / 1024).toFixed(2), // MB
+        activeConnections: activeCount
       }
     });
   } catch (error) {
@@ -233,7 +225,7 @@ function calculateNodePosition(device, index, total) {
   const centerX = 400;
   const centerY = 300;
   const angle = (2 * Math.PI * index) / total;
-  
+
   return {
     x: centerX + radius * Math.cos(angle),
     y: centerY + radius * Math.sin(angle)
@@ -305,6 +297,31 @@ function calculateTrafficStats(packets) {
     .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
 
   return stats;
+}
+
+
+// Helper to calculate node position in a circle around gateway
+function calculateNodePosition(device, index, total) {
+  const centerX = 400;
+  const centerY = 300;
+  const radius = 250;
+  const angle = (index / total) * 2 * Math.PI;
+
+  return {
+    x: centerX + radius * Math.cos(angle),
+    y: centerY + radius * Math.sin(angle)
+  };
+}
+
+// Helper to get edge color based on risk
+function getEdgeColor(riskLevel) {
+  switch (riskLevel) {
+    case 'critical': return '#ef4444'; // red-500
+    case 'high': return '#f97316'; // orange-500
+    case 'medium': return '#eab308'; // yellow-500
+    case 'low': return '#22c55e'; // green-500
+    default: return '#3b82f6'; // blue-500
+  }
 }
 
 // Helper function to calculate connection quality

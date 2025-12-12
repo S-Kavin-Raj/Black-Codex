@@ -12,7 +12,7 @@ const { promisify } = require('util');
 const { v4: uuidv4 } = require('uuid');
 const { checkCredentials, auditMisconfigurations } = require('./credentialChecker');
 const { getDeviceCVEs } = require('./cveLookup');
-const { getDatabase } = require('../database/init');
+const { getDatabase, saveDatabase } = require('../database/init');
 const logger = require('../utils/logger');
 
 const execAsync = promisify(exec);
@@ -923,6 +923,16 @@ async function fullNetworkScan(subnet, progressCallback) {
     }
   }
 
+  // IMPORTANT: Mark ALL existing devices as offline before scanning
+  // This ensures only currently-discovered devices are shown as online
+  if (progressCallback) progressCallback(2, 'Preparing scan - clearing stale data...');
+  try {
+    db.prepare("UPDATE devices SET status = 'offline' WHERE status = 'online'").run();
+    logger.info('Marked all existing devices as offline for fresh scan');
+  } catch (err) {
+    logger.error('Error marking devices offline:', err);
+  }
+
   // Step 1: ARP scan for quick device discovery
   if (progressCallback) progressCallback(5, 'Running ARP scan...');
   const arpDevices = await arpScan();
@@ -949,20 +959,43 @@ async function fullNetworkScan(subnet, progressCallback) {
   }
 
   const totalDevices = arpDevices.length;
+  let totalPortsChecked = 0;
+  let totalVulnsFound = 0;
+  const allVulnerabilities = []; // Collect all vulnerabilities with device info for frontend display
   logger.info(`Found ${totalDevices} potential devices`);
 
-  // Step 3: Scan each device
+  // Step 3: Scan each device - but verify it's alive first
   for (let i = 0; i < arpDevices.length; i++) {
     const arpDevice = arpDevices[i];
     const progress = 20 + Math.floor((i / totalDevices) * 70);
 
     if (progressCallback) {
-      progressCallback(progress, `Scanning ${arpDevice.ip}...`);
+      progressCallback(progress, `Verifying ${arpDevice.ip}...`, {
+        devicesScanned: devices.length,
+        portsChecked: totalPortsChecked,
+        vulnsFound: totalVulnsFound
+      });
     }
 
     try {
+      // IMPORTANT: Verify device is actually alive before including it
+      const isAlive = await pingHost(arpDevice.ip, 1500);
+      if (!isAlive) {
+        logger.info(`Device ${arpDevice.ip} is not responding, skipping`);
+        continue; // Skip this device - it's not currently connected
+      }
+
+      if (progressCallback) {
+        progressCallback(progress, `Scanning ${arpDevice.ip}...`, {
+          devicesScanned: devices.length,
+          portsChecked: totalPortsChecked,
+          vulnsFound: totalVulnsFound
+        });
+      }
+
       // Port scan
       const openPorts = await scanPorts(arpDevice.ip, QUICK_SCAN_PORTS);
+      totalPortsChecked += QUICK_SCAN_PORTS.length;
 
       // Get vendor and device type
       const vendor = lookupVendor(arpDevice.mac);
@@ -986,6 +1019,11 @@ async function fullNetworkScan(subnet, progressCallback) {
       // Calculate risk
       device.riskScore = calculateRiskScore(device);
       device.riskLevel = getRiskLevel(device.riskScore);
+
+      // Count vulnerabilities based on risk
+      if (device.riskLevel === 'critical' || device.riskLevel === 'high' || device.riskLevel === 'medium' || device.riskLevel === 'low') {
+        totalVulnsFound++;
+      }
 
       devices.push(device);
 
@@ -1063,8 +1101,23 @@ async function fullNetworkScan(subnet, progressCallback) {
         `).run(uuidv4(), device.id, port, getServiceName(port));
       }
 
-      // Check for vulnerabilities
-      await checkDeviceVulnerabilities(device);
+      // Check for vulnerabilities and collect them with IP info
+      const deviceVulns = await checkDeviceVulnerabilities(device);
+      if (deviceVulns && deviceVulns.length > 0) {
+        for (const vuln of deviceVulns) {
+          allVulnerabilities.push({
+            id: uuidv4(),
+            name: vuln.title,
+            severity: vuln.severity,
+            description: vuln.description,
+            cve: vuln.cve_id,
+            host: device.ip,
+            port: vuln.port || (device.openPorts.length > 0 ? device.openPorts[0] : null),
+            hostname: device.hostname
+          });
+        }
+        totalVulnsFound += deviceVulns.length;
+      }
 
     } catch (error) {
       logger.error(`Error scanning ${arpDevice.ip}:`, error.message);
@@ -1082,6 +1135,7 @@ async function fullNetworkScan(subnet, progressCallback) {
 
   return {
     devices,
+    vulnerabilities: allVulnerabilities, // Include all found vulnerabilities with IP info
     summary: {
       total: devices.length,
       online: devices.length,
@@ -1089,7 +1143,8 @@ async function fullNetworkScan(subnet, progressCallback) {
       high: devices.filter(d => d.riskLevel === 'high').length,
       medium: devices.filter(d => d.riskLevel === 'medium').length,
       low: devices.filter(d => d.riskLevel === 'low').length,
-      safe: devices.filter(d => d.riskLevel === 'safe').length
+      safe: devices.filter(d => d.riskLevel === 'safe').length,
+      vulnerabilitiesCount: allVulnerabilities.length
     }
   };
 }
@@ -1173,6 +1228,30 @@ async function checkDeviceVulnerabilities(device) {
     });
   }
 
+  // Unknown Vendor Warning
+  if (device.vendor === 'Unknown' || device.vendor === 'Unknown Vendor') {
+    vulns.push({
+      title: 'Unknown Device Vendor',
+      severity: 'low',
+      description: 'Device manufacturer could not be identified via MAC address. This may indicate a randomized MAC or obscure IoT device.',
+      cve_id: null,
+      cvss_score: 2.0,
+      remediation: 'Verify device identity manually.'
+    });
+  }
+
+  // Excessive Open Ports
+  if (device.openPorts.length > 5) {
+    vulns.push({
+      title: 'Excessive Open Ports',
+      severity: 'low',
+      description: `Device has ${device.openPorts.length} open ports, increasing attack surface.`,
+      cve_id: null,
+      cvss_score: 3.5,
+      remediation: 'Close unnecessary ports and services.'
+    });
+  }
+
   // Save vulnerabilities to database
   for (const vuln of vulns) {
     const existing = db.prepare(
@@ -1195,19 +1274,41 @@ async function checkDeviceVulnerabilities(device) {
         now
       );
 
+      // ...
+      const { emit } = require('../websocket/server');
+
+      // ... (inside checkDeviceVulnerabilities)
+
       // Create alert for critical/high vulns
       if (vuln.severity === 'critical' || vuln.severity === 'high') {
+        const alertId = uuidv4();
+        const alertMessage = `${vuln.severity.toUpperCase()}: ${vuln.title} on ${device.ip}`;
+
         db.prepare(`
           INSERT INTO alerts (id, type, severity, device_id, device_ip, message, created_at)
           VALUES (?, 'vulnerability', ?, ?, ?, ?, ?)
         `).run(
-          uuidv4(),
+          alertId,
           vuln.severity,
           device.id,
           device.ip,
-          `${vuln.severity.toUpperCase()}: ${vuln.title} on ${device.ip}`,
+          alertMessage,
           now
         );
+
+        // Emit real-time alert
+        if (emit && emit.alertCreated) {
+          emit.alertCreated({
+            id: alertId,
+            type: 'vulnerability',
+            severity: vuln.severity,
+            device_id: device.id,
+            device_ip: device.ip,
+            message: alertMessage,
+            created_at: now,
+            acknowledged: 0
+          });
+        }
       }
     }
   }
@@ -1489,10 +1590,67 @@ async function refreshDevices() {
     db.save();
   }
 
-  return { success: true, newDevices: newCount, updatedDevices: updatedCount };
+  if (typeof db.save === 'function') {
+    db.save();
+  }
+
+  return { success: true, newDevices: newCount, updatedDevices: updatedCount, devices: discoveredDevices };
+}
+
+
+/**
+ * Get real network traffic statistics from OS
+ */
+async function getNetworkTraffic() {
+  const platform = os.platform();
+
+  try {
+    if (platform === 'win32') {
+      // Windows: netstat -e gives interface stats
+      const { stdout } = await execAsync('netstat -e', { encoding: 'utf8' });
+      const lines = stdout.split('\n');
+
+      for (const line of lines) {
+        if (line.trim().startsWith('Bytes')) {
+          const parts = line.trim().split(/\s+/);
+          // Format: Bytes [Received] [Sent]
+          // parts[0]="Bytes", parts[1]=Received, parts[2]=Sent
+          return {
+            received: parseInt(parts[1], 10) || 0,
+            sent: parseInt(parts[2], 10) || 0
+          };
+        }
+      }
+    } else {
+      // Linux/Mac: Read /proc/net/dev or use netstat -i
+      try {
+        const { stdout } = await execAsync('cat /proc/net/dev', { encoding: 'utf8' });
+        const lines = stdout.split('\n');
+        let totalRx = 0;
+        let totalTx = 0;
+
+        for (const line of lines) {
+          if (line.includes(':')) {
+            const parts = line.split(':')[1].trim().split(/\s+/);
+            // parts[0] = Rx bytes, parts[8] = Tx bytes (usually)
+            totalRx += parseInt(parts[0], 10) || 0;
+            totalTx += parseInt(parts[8], 10) || 0;
+          }
+        }
+        return { received: totalRx, sent: totalTx };
+      } catch (e) {
+        return { received: 0, sent: 0 };
+      }
+    }
+  } catch (error) {
+    logger.error('Failed to get network traffic:', error.message);
+  }
+
+  return { received: 0, sent: 0 };
 }
 
 module.exports = {
+  getNetworkTraffic,
   fullNetworkScan,
   quickDiscovery,
   scanDevicePorts,

@@ -45,7 +45,7 @@ app.use(cors({ origin: corsOrigins, credentials: true }));
 // Rate limiting
 const limiter = rateLimit({
   windowMs: (process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000,
-  max: process.env.RATE_LIMIT_MAX || 100,
+  max: 10000, // Effectively disabled for local use
   message: { error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
@@ -64,6 +64,17 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     service: 'Black Codex Backend'
+  });
+});
+
+// API Health check (for diagnostics)
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    service: 'Black Codex Backend',
+    uptime: process.uptime()
   });
 });
 

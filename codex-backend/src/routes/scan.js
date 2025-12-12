@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { getDatabase, saveDatabase } = require('../database/init');
 const { authenticate, optionalAuth } = require('../middleware/auth');
 const { logAudit } = require('../middleware/audit');
-const { broadcast } = require('../websocket/server');
+const { broadcast, emit } = require('../websocket/server');
 const RealScanner = require('../services/realNetworkScanner');
 const logger = require('../utils/logger');
 const { getLatestNetworkScore, getScoreTrends } = require('../services/securityScore');
@@ -21,15 +21,16 @@ let activeScan = null;
 router.get('/devices', optionalAuth, async (req, res) => {
   try {
     logger.info('Starting quick device discovery...');
-    
-    const devices = await RealScanner.quickDiscovery();
-    
-    logger.info(`Quick discovery found ${devices.length} devices`);
-    
+
+    // Use refreshDevices to ensuring DB and Topology stay in sync
+    const result = await RealScanner.refreshDevices();
+
+    logger.info(`Quick discovery found ${result.devices.length} devices`);
+
     res.json({
       success: true,
-      count: devices.length,
-      devices,
+      count: result.devices.length,
+      devices: result.devices, // Return the actual devices found
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -45,20 +46,20 @@ router.get('/ports/:ip', optionalAuth, async (req, res) => {
   try {
     const { ip } = req.params;
     const { full } = req.query;
-    
+
     // Validate IP
     if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
       return res.status(400).json({ error: 'Invalid IP address' });
     }
-    
+
     logger.info(`Starting port scan on ${ip}...`);
-    
-    const ports = full === 'true' 
-      ? RealScanner.IOT_PORTS 
+
+    const ports = full === 'true'
+      ? RealScanner.IOT_PORTS
       : RealScanner.QUICK_SCAN_PORTS;
-    
+
     const results = await RealScanner.scanDevicePorts(ip, ports);
-    
+
     // Get service banners for HTTP ports
     const enhancedResults = await Promise.all(results.map(async (portInfo) => {
       if ([80, 8080, 443, 8443].includes(portInfo.port)) {
@@ -71,9 +72,9 @@ router.get('/ports/:ip', optionalAuth, async (req, res) => {
       }
       return portInfo;
     }));
-    
+
     logger.info(`Port scan found ${results.length} open ports on ${ip}`);
-    
+
     res.json({
       success: true,
       ip,
@@ -95,12 +96,12 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
     const { ip } = req.params;
     const { ports: portQuery } = req.query;
     const { ports: bodyPorts, full } = req.body;
-    
+
     // Validate IP
     if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
       return res.status(400).json({ error: 'Invalid IP address' });
     }
-    
+
     // Determine which ports to scan
     let portsToScan;
     if (portQuery) {
@@ -112,9 +113,9 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
     } else {
       portsToScan = RealScanner.QUICK_SCAN_PORTS;
     }
-    
+
     logger.info(`Starting ad-hoc port scan on ${ip} for ports: ${portsToScan.join(',')}`);
-    
+
     // Broadcast scan started
     broadcast('devices', {
       type: 'port_scan_started',
@@ -122,7 +123,7 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
       ports: portsToScan,
       timestamp: new Date().toISOString()
     });
-    
+
     // Send immediate response
     res.json({
       success: true,
@@ -130,30 +131,30 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
       ip,
       ports: portsToScan
     });
-    
+
     // Run scan asynchronously and broadcast results
     const openPorts = [];
-    
+
     for (const port of portsToScan) {
       const isOpen = await RealScanner.checkPort(ip, port);
-      
+
       if (isOpen) {
         const service = RealScanner.getServiceName(port);
         const portInfo = { port, service, open: true };
-        
+
         // Grab banner for HTTP ports
         if ([80, 8080, 443, 8443].includes(port)) {
           try {
             portInfo.banner = await RealScanner.grabBanner(ip, port);
-          } catch {}
+          } catch { }
         }
-        
+
         // Check if risky port
         const riskyPorts = [23, 7547, 5555, 69, 161, 502, 37777, 5357];
         portInfo.risky = riskyPorts.includes(port);
-        
+
         openPorts.push(portInfo);
-        
+
         // Broadcast each open port found
         broadcast('devices', {
           type: 'port_open',
@@ -166,22 +167,22 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
         });
       }
     }
-    
+
     // Update device in database with ports
     try {
       const db = getDatabase();
       const device = db.prepare('SELECT id FROM devices WHERE ip = ?').get(ip);
-      
+
       if (device) {
         db.prepare(`
           UPDATE devices SET open_ports = ?, updated_at = ?
           WHERE ip = ?
         `).run(JSON.stringify(openPorts), new Date().toISOString(), ip);
-        
+
         // Also insert into ports table
         for (const portInfo of openPorts) {
           const existingPort = db.prepare('SELECT id FROM ports WHERE device_id = ? AND port = ?').get(device.id, portInfo.port);
-          
+
           if (!existingPort) {
             db.prepare(`
               INSERT INTO ports (id, device_id, port, protocol, service, banner, is_risky, discovered_at)
@@ -203,7 +204,7 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
     } catch (dbErr) {
       logger.error('Error saving port scan results:', dbErr);
     }
-    
+
     // Broadcast scan completed
     broadcast('devices', {
       type: 'port_scan_completed',
@@ -213,9 +214,9 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
       openCount: openPorts.length,
       timestamp: new Date().toISOString()
     });
-    
+
     logger.info(`Port scan completed on ${ip}: ${openPorts.length} open ports`);
-    
+
   } catch (error) {
     logger.error('Ad-hoc port scan error:', error);
     res.status(500).json({ error: 'Failed to start port scan', details: error.message });
@@ -228,12 +229,12 @@ router.post('/ports/:ip', optionalAuth, async (req, res) => {
 router.get('/network-info', optionalAuth, (req, res) => {
   try {
     const networkInfo = RealScanner.getNetworkInfo();
-    
+
     const subnets = networkInfo.map(iface => ({
       ...iface,
       subnet: RealScanner.calculateSubnet(iface.ip, iface.netmask)
     }));
-    
+
     res.json({
       success: true,
       interfaces: subnets,
@@ -251,24 +252,24 @@ router.get('/network-info', optionalAuth, (req, res) => {
 router.post('/start', optionalAuth, async (req, res) => {
   try {
     if (activeScan && activeScan.status === 'running') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'A scan is already in progress',
         scanId: activeScan.id
       });
     }
-    
+
     const db = getDatabase();
     const scanId = uuidv4();
     const { subnet, type = 'full' } = req.body;
     const userId = req.user?.id || 'system';
-    
+
     // Create scan record
     const startTime = new Date().toISOString();
     db.prepare(`
       INSERT INTO scans (id, type, status, progress, started_by, start_time)
       VALUES (?, ?, 'running', 0, ?, ?)
     `).run(scanId, type, userId, startTime);
-    
+
     activeScan = {
       id: scanId,
       status: 'running',
@@ -276,11 +277,11 @@ router.post('/start', optionalAuth, async (req, res) => {
       message: 'Initializing scan...',
       startTime
     };
-    
+
     if (req.user) {
       logAudit(req.user.id, 'SCAN_STARTED', 'scan', scanId, { type, subnet }, req);
     }
-    
+
     // Send initial response
     res.json({
       success: true,
@@ -288,10 +289,10 @@ router.post('/start', optionalAuth, async (req, res) => {
       status: 'running',
       message: 'Scan started successfully'
     });
-    
+
     // Run scan asynchronously
     runFullScan(scanId, subnet, userId);
-    
+
   } catch (error) {
     logger.error('Start scan error:', error);
     res.status(500).json({ error: 'Failed to start scan' });
@@ -303,27 +304,63 @@ router.post('/start', optionalAuth, async (req, res) => {
  */
 async function runFullScan(scanId, subnet, userId) {
   const db = getDatabase();
-  
+  const startTime = Date.now();
+  let devicesScanned = 0;
+  let portsChecked = 0;
+  let vulnsFound = 0;
+
   try {
-    const result = await RealScanner.fullNetworkScan(subnet, (progress, message) => {
-      // Update progress
+    const result = await RealScanner.fullNetworkScan(subnet, (progress, message, stats = {}) => {
+      // Update progress and track stats
+      devicesScanned = stats.devicesScanned || devicesScanned;
+      portsChecked = stats.portsChecked || portsChecked;
+      vulnsFound = stats.vulnsFound || vulnsFound;
+
+      // Calculate time estimate
+      const elapsed = (Date.now() - startTime) / 1000;
+      const estimatedTotal = progress > 5 ? (elapsed / progress) * 100 : 60;
+      const remaining = Math.max(0, estimatedTotal - elapsed);
+      const mins = Math.floor(remaining / 60);
+      const secs = Math.floor(remaining % 60);
+      const timeLeft = `${mins}:${secs.toString().padStart(2, '0')}`;
+
       activeScan.progress = progress;
       activeScan.message = message;
-      
+      activeScan.devicesScanned = devicesScanned;
+      activeScan.portsChecked = portsChecked;
+      activeScan.vulnsFound = vulnsFound;
+      activeScan.timeLeft = timeLeft;
+
       db.prepare('UPDATE scans SET progress = ? WHERE id = ?').run(progress, scanId);
-      
-      // Broadcast progress via WebSocket
+
+      // Broadcast detailed progress via WebSocket
       broadcast('scan', {
         type: 'scan_progress',
         scanId,
         progress,
-        message
+        message,
+        devicesScanned,
+        portsChecked: portsChecked || (devicesScanned * 10),
+        vulnsFound,
+        timeLeft
       });
+
+      // Also emit as direct scan_progress event for frontend listeners
+      if (emit && emit.scanProgress) {
+        emit.scanProgress(scanId, {
+          progress,
+          message,
+          devicesScanned,
+          portsChecked: portsChecked || (devicesScanned * 10),
+          vulnsFound,
+          timeLeft
+        });
+      }
     });
-    
+
     // Complete the scan
     const endTime = new Date().toISOString();
-    
+
     db.prepare(`
       UPDATE scans SET 
         status = 'completed',
@@ -339,18 +376,24 @@ async function runFullScan(scanId, subnet, userId) {
       result.summary.critical + result.summary.high,
       result.summary.critical,
       endTime,
-      JSON.stringify(result.summary),
+      JSON.stringify({
+        summary: result.summary,
+        vulnerabilities: result.vulnerabilities || []
+      }),
       scanId
     );
-    
+
     saveDatabase();
-    
+
     activeScan = {
       id: scanId,
       status: 'completed',
       progress: 100,
       message: 'Scan complete',
-      result: result.summary
+      result: {
+        summary: result.summary,
+        vulnerabilities: result.vulnerabilities || []
+      }
     };
 
     // Stream discovered devices to websocket clients for real-time UI updates
@@ -372,35 +415,36 @@ async function runFullScan(scanId, subnet, userId) {
     if (result.networkInfo) {
       broadcast('scan', { type: 'network_info', scanId, network: result.networkInfo });
     }
-    
-    // Broadcast completion
+
+    // Broadcast completion with vulnerabilities
     broadcast('scan', {
       type: 'scan_complete',
       scanId,
-      result: result.summary
+      result: result.summary,
+      vulnerabilities: result.vulnerabilities || []
     });
-    
+
     // Broadcast alert update
     broadcast('alerts', {
       type: 'alerts_updated'
     });
-    
+
     logger.info(`Scan ${scanId} completed successfully`);
-    
+
   } catch (error) {
     logger.error(`Scan ${scanId} failed:`, error);
-    
+
     db.prepare(`
       UPDATE scans SET status = 'failed', end_time = ? WHERE id = ?
     `).run(new Date().toISOString(), scanId);
-    
+
     activeScan = {
       id: scanId,
       status: 'failed',
       progress: 0,
       message: error.message
     };
-    
+
     broadcast('scan', {
       type: 'scan_failed',
       scanId,
@@ -420,25 +464,28 @@ router.get('/status', optionalAuth, (req, res) => {
         ...activeScan
       });
     }
-    
+
     // Get most recent scan from database
     const db = getDatabase();
     const lastScan = db.prepare(`
       SELECT * FROM scans ORDER BY start_time DESC LIMIT 1
     `).get();
-    
+
     if (lastScan) {
+      let result = null;
       if (lastScan.results) {
         try {
-          lastScan.results = JSON.parse(lastScan.results);
-        } catch {}
+          result = JSON.parse(lastScan.results);
+        } catch { }
       }
+
       return res.json({
         success: true,
-        ...lastScan
+        ...lastScan,
+        result: result // Normalize to 'result' to match activeScan structure
       });
     }
-    
+
     res.json({
       success: true,
       status: 'idle',
@@ -458,22 +505,22 @@ router.post('/stop', authenticate, (req, res) => {
     if (!activeScan || activeScan.status !== 'running') {
       return res.status(400).json({ error: 'No scan is currently running' });
     }
-    
+
     const db = getDatabase();
-    
+
     db.prepare(`
       UPDATE scans SET status = 'cancelled', end_time = ? WHERE id = ?
     `).run(new Date().toISOString(), activeScan.id);
-    
+
     logAudit(req.user.id, 'SCAN_CANCELLED', 'scan', activeScan.id, {}, req);
-    
+
     activeScan.status = 'cancelled';
-    
+
     broadcast('scan', {
       type: 'scan_cancelled',
       scanId: activeScan.id
     });
-    
+
     res.json({
       success: true,
       message: 'Scan cancelled'
@@ -491,24 +538,24 @@ router.get('/history', authenticate, (req, res) => {
   try {
     const { limit = 20, offset = 0 } = req.query;
     const db = getDatabase();
-    
+
     const scans = db.prepare(`
       SELECT * FROM scans 
       ORDER BY start_time DESC 
       LIMIT ? OFFSET ?
     `).all(parseInt(limit), parseInt(offset));
-    
+
     const total = db.prepare('SELECT COUNT(*) as count FROM scans').get().count;
-    
+
     // Parse results JSON
     for (const scan of scans) {
       if (scan.results) {
         try {
           scan.results = JSON.parse(scan.results);
-        } catch {}
+        } catch { }
       }
     }
-    
+
     res.json({
       success: true,
       scans,
@@ -527,17 +574,17 @@ router.get('/:id', authenticate, (req, res) => {
   try {
     const db = getDatabase();
     const scan = db.prepare('SELECT * FROM scans WHERE id = ?').get(req.params.id);
-    
+
     if (!scan) {
       return res.status(404).json({ error: 'Scan not found' });
     }
-    
+
     if (scan.results) {
       try {
         scan.results = JSON.parse(scan.results);
-      } catch {}
+      } catch { }
     }
-    
+
     res.json({
       success: true,
       scan
@@ -554,13 +601,13 @@ router.get('/:id', authenticate, (req, res) => {
 router.post('/ping/:ip', optionalAuth, async (req, res) => {
   try {
     const { ip } = req.params;
-    
+
     if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
       return res.status(400).json({ error: 'Invalid IP address' });
     }
-    
+
     const alive = await RealScanner.pingHost(ip);
-    
+
     res.json({
       success: true,
       ip,
@@ -579,13 +626,13 @@ router.post('/ping/:ip', optionalAuth, async (req, res) => {
 router.get('/arp', optionalAuth, async (req, res) => {
   try {
     const devices = await RealScanner.arpScan();
-    
+
     // Enhance with vendor info
     const enhanced = devices.map(d => ({
       ...d,
       vendor: RealScanner.lookupVendor(d.mac)
     }));
-    
+
     res.json({
       success: true,
       count: enhanced.length,

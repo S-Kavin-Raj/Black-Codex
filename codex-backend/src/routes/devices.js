@@ -261,20 +261,35 @@ router.delete('/:id', authenticate, (req, res) => {
 });
 
 // Get device statistics
-router.get('/stats/summary', authenticate, (req, res) => {
+router.get('/stats/summary', optionalAuth, (req, res) => {
   try {
     const db = getDatabase();
 
     const total = db.prepare('SELECT COUNT(*) as count FROM devices').get().count;
     const online = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'online'").get().count;
     const offline = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'offline'").get().count;
-    const quarantined = db.prepare("SELECT COUNT(*) as count FROM devices WHERE is_quarantined = 1").get().count;
+    const quarantined = db.prepare("SELECT COUNT(*) as count FROM devices WHERE status = 'quarantined'").get().count;
 
-    const byType = db.prepare('SELECT type, COUNT(*) as count FROM devices GROUP BY type').all();
+    const byType = db.prepare('SELECT device_type as type, COUNT(*) as count FROM devices GROUP BY device_type').all();
     const byRiskLevel = db.prepare('SELECT risk_level, COUNT(*) as count FROM devices GROUP BY risk_level').all();
 
     const criticalDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'critical'").get().count;
     const highRiskDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'high'").get().count;
+    const mediumRiskDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'medium'").get().count;
+    const lowRiskDevices = db.prepare("SELECT COUNT(*) as count FROM devices WHERE risk_level = 'low' OR risk_level = 'safe' OR risk_level IS NULL").get().count;
+
+    // Calculate network-wide security score (100 = perfect, lower = more risky)
+    // Each critical device reduces score by 15, high by 10, medium by 5
+    let securityScore = 100;
+    securityScore -= criticalDevices * 15;
+    securityScore -= highRiskDevices * 10;
+    securityScore -= mediumRiskDevices * 5;
+    securityScore = Math.max(0, Math.min(100, securityScore)); // Clamp between 0-100
+
+    // Get threat/alert counts
+    const criticalAlerts = db.prepare("SELECT COUNT(*) as count FROM alerts WHERE severity = 'critical' AND acknowledged = 0").get().count;
+    const totalThreats = db.prepare("SELECT COUNT(*) as count FROM alerts WHERE type IN ('threat', 'intrusion', 'vulnerability', 'critical_cve', 'weak_credentials')").get().count;
+    const totalVulnerabilities = db.prepare("SELECT COUNT(*) as count FROM vulnerabilities WHERE status = 'open'").get().count;
 
     res.json({
       total,
@@ -284,7 +299,13 @@ router.get('/stats/summary', authenticate, (req, res) => {
       byType,
       byRiskLevel,
       criticalDevices,
-      highRiskDevices
+      highRiskDevices,
+      mediumRiskDevices,
+      lowRiskDevices,
+      securityScore,
+      criticalAlerts,
+      totalThreats,
+      totalVulnerabilities
     });
   } catch (error) {
     logger.error('Get device stats error:', error);

@@ -10,15 +10,15 @@ const router = express.Router();
 router.get('/', authenticate, (req, res) => {
   try {
     const db = getDatabase();
-    const { 
-      protocol, 
-      source_ip, 
+    const {
+      protocol,
+      source_ip,
       destination_ip,
       source_port,
       destination_port,
       direction,
-      limit = 100, 
-      offset = 0 
+      limit = 100,
+      offset = 0
     } = req.query;
 
     let query = 'SELECT * FROM packet_captures WHERE 1=1';
@@ -156,35 +156,18 @@ router.get('/stats/summary', authenticate, (req, res) => {
   }
 });
 
-// Start packet capture (simulated)
+// Start packet capture (Real capture requires native drivers)
 router.post('/capture/start', authenticate, (req, res) => {
   try {
-    const { interface: iface, filter, duration = 60 } = req.body;
+    // Real packet capture requires 'cap' or 'pcap' libraries and system drivers (e.g. Npcap on Windows).
+    // Since we cannot guarantee these are installed, and we are strictly avoiding simulated data,
+    // we return a clear message.
 
-    // In production, this would start actual packet capture
-    // For now, we simulate it
-    const captureId = uuidv4();
-
-    // Store capture session
-    const db = getDatabase();
-    db.prepare(`
-      INSERT INTO capture_sessions (id, interface, filter, status, started_at)
-      VALUES (?, ?, ?, 'running', ?)
-    `).run(captureId, iface || 'eth0', filter || '', new Date().toISOString());
-
-    // Simulate generating some packets
-    setTimeout(() => {
-      generateSimulatedPackets(captureId, 50);
-    }, 1000);
-
-    res.json({
-      captureId,
-      status: 'started',
-      interface: iface || 'eth0',
-      filter: filter || '',
-      duration,
-      message: 'Packet capture started'
+    return res.status(501).json({
+      error: 'Real-time packet capture requires Npcap driver installation',
+      message: 'This feature requires low-level system drivers (Npcap/libpcap) to capture raw packets. Simulated data has been disabled as per request.'
     });
+
   } catch (error) {
     logger.error('Start capture error:', error);
     res.status(500).json({ error: 'Failed to start packet capture' });
@@ -193,23 +176,7 @@ router.post('/capture/start', authenticate, (req, res) => {
 
 // Stop packet capture
 router.post('/capture/stop/:id', authenticate, (req, res) => {
-  try {
-    const db = getDatabase();
-
-    db.prepare(`
-      UPDATE capture_sessions SET status = 'stopped', stopped_at = ?
-      WHERE id = ?
-    `).run(new Date().toISOString(), req.params.id);
-
-    res.json({
-      captureId: req.params.id,
-      status: 'stopped',
-      message: 'Packet capture stopped'
-    });
-  } catch (error) {
-    logger.error('Stop capture error:', error);
-    res.status(500).json({ error: 'Failed to stop packet capture' });
-  }
+  res.status(501).json({ error: 'Packet capture not active' });
 });
 
 // Get live packet stream (WebSocket endpoint info)
@@ -243,10 +210,10 @@ router.delete('/history', authenticate, (req, res) => {
 router.post('/search', authenticate, (req, res) => {
   try {
     const db = getDatabase();
-    const { 
-      protocols, 
-      ipAddresses, 
-      ports, 
+    const {
+      protocols,
+      ipAddresses,
+      ports,
       dateRange,
       minSize,
       maxSize
@@ -307,50 +274,5 @@ router.post('/search', authenticate, (req, res) => {
     res.status(500).json({ error: 'Failed to search packets' });
   }
 });
-
-// Helper function to generate simulated packets
-function generateSimulatedPackets(captureId, count) {
-  const db = getDatabase();
-  const protocols = ['TCP', 'UDP', 'ICMP', 'HTTP', 'HTTPS', 'DNS', 'ARP'];
-  const directions = ['inbound', 'outbound', 'internal'];
-
-  for (let i = 0; i < count; i++) {
-    const packet = {
-      id: uuidv4(),
-      capture_id: captureId,
-      timestamp: new Date().toISOString(),
-      protocol: protocols[Math.floor(Math.random() * protocols.length)],
-      source_ip: `192.168.1.${Math.floor(Math.random() * 254) + 1}`,
-      source_port: Math.floor(Math.random() * 65535),
-      destination_ip: `192.168.1.${Math.floor(Math.random() * 254) + 1}`,
-      destination_port: [80, 443, 22, 53, 8080, 3389][Math.floor(Math.random() * 6)],
-      size: Math.floor(Math.random() * 1500) + 64,
-      direction: directions[Math.floor(Math.random() * directions.length)],
-      info: 'Simulated packet capture'
-    };
-
-    try {
-      db.prepare(`
-        INSERT INTO packet_captures 
-        (id, capture_id, timestamp, protocol, source_ip, source_port, destination_ip, destination_port, size, direction, info)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        packet.id,
-        packet.capture_id,
-        packet.timestamp,
-        packet.protocol,
-        packet.source_ip,
-        packet.source_port,
-        packet.destination_ip,
-        packet.destination_port,
-        packet.size,
-        packet.direction,
-        packet.info
-      );
-    } catch (err) {
-      logger.error('Failed to insert simulated packet:', err);
-    }
-  }
-}
 
 module.exports = router;

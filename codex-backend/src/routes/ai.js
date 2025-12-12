@@ -1,13 +1,30 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
-const { getDatabase } = require('../database/init');
+const { getDatabase, saveDatabase } = require('../database/init');
 const { authenticate } = require('../middleware/auth');
 const { logAudit } = require('../middleware/audit');
 const logger = require('../utils/logger');
+const { scanPorts, getServiceName, grabBanner, checkPort } = require('../services/realNetworkScanner');
+const { getDeviceCVEs } = require('../services/cveLookup');
 
 const router = express.Router();
 
-// Analyze device with AI
+// Common risky ports and their threats
+const RISKY_PORTS = {
+  21: { name: 'FTP', risk: 'high', threat: 'FTP allows unencrypted file transfer, credentials can be sniffed' },
+  23: { name: 'Telnet', risk: 'critical', threat: 'Telnet transmits all data in plaintext including passwords' },
+  135: { name: 'RPC', risk: 'high', threat: 'Windows RPC can be exploited for remote code execution' },
+  139: { name: 'NetBIOS', risk: 'high', threat: 'NetBIOS can leak sensitive system information' },
+  445: { name: 'SMB', risk: 'critical', threat: 'SMB vulnerabilities have been used in major ransomware attacks' },
+  3389: { name: 'RDP', risk: 'critical', threat: 'RDP is frequently targeted by brute-force and exploit attacks' },
+  7547: { name: 'TR-069', risk: 'critical', threat: 'TR-069 CWMP protocol has severe vulnerabilities in IoT devices' },
+  1883: { name: 'MQTT', risk: 'medium', threat: 'Unencrypted MQTT can leak IoT device data' },
+  554: { name: 'RTSP', risk: 'medium', threat: 'RTSP streams may be accessed without authentication' },
+  37777: { name: 'Dahua', risk: 'high', threat: 'Dahua proprietary protocol, often has default credentials' },
+  34567: { name: 'DVR', risk: 'high', threat: 'DVR admin port commonly targeted by botnets' }
+};
+
+// Analyze device with AI - NOW WITH REAL-TIME SCANNING
 router.post('/analyze', authenticate, async (req, res) => {
   try {
     const { deviceId, analysisType = 'full' } = req.body;
@@ -22,18 +39,93 @@ router.post('/analyze', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Device not found' });
     }
 
-    // Get device vulnerabilities
+    logger.info(`[AI] Starting real-time analysis for device: ${device.name} (${device.ip})`);
+
+    // REAL-TIME: Perform live port scan on the device
+    let livePorts = [];
+    let livePortDetails = [];
+    try {
+      logger.info(`[AI] Performing live port scan on ${device.ip}...`);
+      const commonPorts = [21, 22, 23, 80, 443, 135, 139, 445, 554, 1433, 1883, 3306, 3389, 5000, 5001, 7547, 8080, 8443, 8554, 8883, 9100, 34567, 37777];
+      livePorts = await scanPorts(device.ip, commonPorts, 15);
+
+      // Get service details for each open port
+      for (const port of livePorts) {
+        const portInfo = {
+          port_number: port,
+          service_name: getServiceName(port),
+          status: 'open',
+          risk_level: RISKY_PORTS[port]?.risk || 'low'
+        };
+        livePortDetails.push(portInfo);
+
+        // Save port to database if not exists
+        const existingPort = db.prepare('SELECT id FROM ports WHERE device_id = ? AND port_number = ?').get(deviceId, port);
+        if (!existingPort) {
+          db.prepare(`
+            INSERT INTO ports (id, device_id, port_number, protocol, service_name, status, risk_level)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `).run(uuidv4(), deviceId, port, 'TCP', portInfo.service_name, 'open', portInfo.risk_level);
+        }
+      }
+      logger.info(`[AI] Live scan found ${livePorts.length} open ports on ${device.ip}`);
+    } catch (scanError) {
+      logger.warn(`[AI] Live port scan failed for ${device.ip}: ${scanError.message}`);
+    }
+
+    // REAL-TIME: Query CVE database for device vulnerabilities
+    let liveCVEs = [];
+    try {
+      if (device.manufacturer || device.device_type) {
+        logger.info(`[AI] Querying CVE database for ${device.manufacturer || device.device_type}...`);
+        liveCVEs = await getDeviceCVEs({
+          vendor: device.manufacturer,
+          model: device.model,
+          type: device.device_type
+        });
+        logger.info(`[AI] Found ${liveCVEs.length} CVEs for device`);
+
+        // Save high-severity CVEs as vulnerabilities
+        for (const cve of liveCVEs.slice(0, 10)) { // Top 10 CVEs
+          if (cve.cvssScore >= 7.0) {
+            const existingVuln = db.prepare('SELECT id FROM vulnerabilities WHERE device_id = ? AND cve_id = ?').get(deviceId, cve.id);
+            if (!existingVuln) {
+              const severity = cve.cvssScore >= 9.0 ? 'critical' : cve.cvssScore >= 7.0 ? 'high' : 'medium';
+              db.prepare(`
+                INSERT INTO vulnerabilities (id, device_id, title, severity, description, cve_id, cvss_score, status, discovered_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              `).run(
+                uuidv4(), deviceId,
+                `${cve.id}: ${cve.description?.substring(0, 100) || 'Vulnerability'}...`,
+                severity, cve.description, cve.id, cve.cvssScore, 'open', new Date().toISOString()
+              );
+            }
+          }
+        }
+      }
+    } catch (cveError) {
+      logger.warn(`[AI] CVE lookup failed: ${cveError.message}`);
+    }
+
+    // Get all vulnerabilities (existing + newly discovered)
     const vulnerabilities = db.prepare(`
       SELECT * FROM vulnerabilities WHERE device_id = ? AND status = 'open'
     `).all(deviceId);
 
-    // Get device ports
+    // Get all ports (existing + newly discovered)
     const ports = db.prepare(`
       SELECT * FROM ports WHERE device_id = ?
     `).all(deviceId);
 
-    // Simulate AI analysis (in production, this would call an actual AI service)
-    const analysis = performAIAnalysis(device, vulnerabilities, ports, analysisType);
+    // Perform comprehensive AI analysis with real-time data
+    const analysis = performRealTimeAIAnalysis(device, vulnerabilities, ports, livePorts, liveCVEs, analysisType);
+
+    // Update device risk score based on analysis
+    const newRiskScore = calculateRiskScore(vulnerabilities, ports);
+    const newRiskLevel = newRiskScore >= 80 ? 'critical' : newRiskScore >= 60 ? 'high' : newRiskScore >= 40 ? 'medium' : newRiskScore >= 20 ? 'low' : 'safe';
+
+    db.prepare('UPDATE devices SET risk_score = ?, risk_level = ?, last_seen = ? WHERE id = ?')
+      .run(newRiskScore, newRiskLevel, new Date().toISOString(), deviceId);
 
     // Store the analysis result
     const reportId = uuidv4();
@@ -42,7 +134,12 @@ router.post('/analyze', authenticate, async (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `).run(reportId, deviceId, analysisType, JSON.stringify(analysis), new Date().toISOString());
 
-    logAudit(req.user.id, 'AI_ANALYSIS_PERFORMED', 'device', deviceId, { analysisType }, req);
+    // Save database changes
+    saveDatabase();
+
+    logAudit(req.user.id, 'AI_ANALYSIS_PERFORMED', 'device', deviceId, { analysisType, portsScanned: livePorts.length, cvesFound: liveCVEs.length }, req);
+
+    logger.info(`[AI] Analysis complete for ${device.name}: Risk Score ${newRiskScore}, ${vulnerabilities.length} vulns, ${ports.length} ports`);
 
     res.json({
       reportId,
@@ -54,6 +151,222 @@ router.post('/analyze', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Failed to perform AI analysis' });
   }
 });
+
+// Calculate risk score based on vulnerabilities and ports
+function calculateRiskScore(vulnerabilities, ports) {
+  let score = 0;
+
+  // Add points for vulnerabilities
+  for (const vuln of vulnerabilities) {
+    if (vuln.severity === 'critical') score += 25;
+    else if (vuln.severity === 'high') score += 15;
+    else if (vuln.severity === 'medium') score += 8;
+    else score += 3;
+  }
+
+  // Add points for risky open ports
+  for (const port of ports) {
+    const portNum = port.port_number || port;
+    if (RISKY_PORTS[portNum]?.risk === 'critical') score += 15;
+    else if (RISKY_PORTS[portNum]?.risk === 'high') score += 10;
+    else if (RISKY_PORTS[portNum]?.risk === 'medium') score += 5;
+  }
+
+  return Math.min(100, score);
+}
+
+// Real-time AI Analysis with comprehensive threat detection
+function performRealTimeAIAnalysis(device, vulnerabilities, ports, livePorts, liveCVEs, analysisType) {
+  const analysis = {
+    summary: '',
+    riskAssessment: {
+      score: device.risk_score || 0,
+      level: device.risk_level || 'unknown',
+      factors: [],
+      trends: []
+    },
+    vulnerabilities: {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+      details: [],
+      recentCVEs: liveCVEs.slice(0, 5).map(c => ({
+        id: c.id,
+        score: c.cvssScore,
+        description: c.description?.substring(0, 150)
+      }))
+    },
+    recommendations: [],
+    portAnalysis: [],
+    threatIntelligence: [],
+    realTimeFindings: {
+      scannedAt: new Date().toISOString(),
+      openPortsDiscovered: livePorts.length,
+      cvesMatched: liveCVEs.length,
+      livePortList: livePorts
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  // Count vulnerabilities by severity
+  for (const vuln of vulnerabilities) {
+    const sev = vuln.severity || 'low';
+    if (analysis.vulnerabilities[sev] !== undefined) {
+      analysis.vulnerabilities[sev]++;
+    }
+    analysis.vulnerabilities.details.push({
+      cveId: vuln.cve_id,
+      title: vuln.title,
+      severity: vuln.severity,
+      cvssScore: vuln.cvss_score
+    });
+  }
+
+  // Analyze ports for threats
+  for (const port of ports) {
+    const portNum = port.port_number;
+    const riskyPort = RISKY_PORTS[portNum];
+
+    analysis.portAnalysis.push({
+      port: portNum,
+      service: port.service_name || getServiceName(portNum),
+      status: port.status || 'open',
+      risk: riskyPort?.risk || 'low',
+      threat: riskyPort?.threat || null
+    });
+
+    if (riskyPort) {
+      analysis.riskAssessment.factors.push(`${riskyPort.name} (port ${portNum}) is open - ${riskyPort.threat}`);
+
+      // Add specific threat intelligence
+      analysis.threatIntelligence.push({
+        type: 'exposed_service',
+        port: portNum,
+        service: riskyPort.name,
+        severity: riskyPort.risk,
+        description: riskyPort.threat,
+        recommendation: `Close port ${portNum} if not required, or secure with authentication and encryption`
+      });
+    }
+  }
+
+  // Generate comprehensive summary
+  const criticalIssues = analysis.vulnerabilities.critical +
+    ports.filter(p => RISKY_PORTS[p.port_number]?.risk === 'critical').length;
+  const highIssues = analysis.vulnerabilities.high +
+    ports.filter(p => RISKY_PORTS[p.port_number]?.risk === 'high').length;
+
+  if (criticalIssues > 0) {
+    analysis.summary = `CRITICAL: Device "${device.name}" (${device.ip}) has ${criticalIssues} critical security issues requiring immediate attention. ${analysis.vulnerabilities.critical} critical CVEs and ${ports.filter(p => RISKY_PORTS[p.port_number]?.risk === 'critical').length} critically risky ports detected.`;
+    analysis.riskAssessment.level = 'critical';
+  } else if (highIssues > 0) {
+    analysis.summary = `HIGH RISK: Device "${device.name}" (${device.ip}) has ${highIssues} high-severity issues. Found ${livePorts.length} open ports and ${vulnerabilities.length} known vulnerabilities.`;
+    analysis.riskAssessment.level = 'high';
+  } else if (vulnerabilities.length > 0 || livePorts.length > 5) {
+    analysis.summary = `MODERATE RISK: Device "${device.name}" (${device.ip}) has ${vulnerabilities.length} vulnerabilities and ${livePorts.length} open ports. Review recommended.`;
+    analysis.riskAssessment.level = 'medium';
+  } else {
+    analysis.summary = `LOW RISK: Device "${device.name}" (${device.ip}) appears relatively secure with ${livePorts.length} open ports. Continue monitoring.`;
+    analysis.riskAssessment.level = 'low';
+  }
+
+  // Generate prioritized recommendations
+  if (analysis.vulnerabilities.critical > 0) {
+    analysis.recommendations.push({
+      priority: 'critical',
+      action: `Patch ${analysis.vulnerabilities.critical} critical vulnerabilities immediately`,
+      details: 'Critical vulnerabilities can be exploited remotely for complete system compromise. Check vendor security advisories.',
+      howTo: 'Visit vendor website for firmware/software updates. Apply patches during maintenance window.'
+    });
+  }
+
+  if (ports.some(p => p.port_number === 23)) {
+    analysis.recommendations.push({
+      priority: 'critical',
+      action: 'Disable Telnet immediately and use SSH',
+      details: 'Telnet transmits all data in plaintext. Any network observer can capture credentials.',
+      howTo: 'Access device admin panel > Services > Disable Telnet > Enable SSH with key authentication'
+    });
+  }
+
+  if (ports.some(p => p.port_number === 21)) {
+    analysis.recommendations.push({
+      priority: 'high',
+      action: 'Disable FTP or switch to SFTP/FTPS',
+      details: 'FTP credentials are transmitted unencrypted and can be easily intercepted.',
+      howTo: 'Configure SFTP (SSH-based) or FTPS (TLS-encrypted) instead of plain FTP'
+    });
+  }
+
+  if (ports.some(p => [3389, 5900].includes(p.port_number))) {
+    analysis.recommendations.push({
+      priority: 'critical',
+      action: 'Secure remote access ports (RDP/VNC)',
+      details: 'Remote desktop services are prime targets for brute-force attacks and exploits.',
+      howTo: 'Enable Network Level Authentication, use VPN, implement account lockout policies'
+    });
+  }
+
+  if (ports.some(p => [1883, 8883].includes(p.port_number))) {
+    analysis.recommendations.push({
+      priority: 'high',
+      action: 'Secure MQTT broker with authentication',
+      details: 'Open MQTT allows anyone to subscribe to IoT device messages and control devices.',
+      howTo: 'Configure username/password auth, enable TLS, restrict topic access with ACLs'
+    });
+  }
+
+  if (analysis.vulnerabilities.high > 0) {
+    analysis.recommendations.push({
+      priority: 'high',
+      action: `Address ${analysis.vulnerabilities.high} high-severity vulnerabilities`,
+      details: 'High-severity vulnerabilities may allow unauthorized access or code execution.',
+      howTo: 'Prioritize based on CVSS score and exploitability. Check for available patches.'
+    });
+  }
+
+  // Add device-specific recommendations
+  if (device.device_type === 'camera' || device.device_type === 'doorbell') {
+    analysis.recommendations.push({
+      priority: 'high',
+      action: 'Change default camera credentials',
+      details: 'IP cameras are frequently targeted by botnets using default passwords.',
+      howTo: 'Access camera web interface, navigate to Settings > Users, create strong admin password'
+    });
+  }
+
+  if (device.device_type === 'router') {
+    analysis.recommendations.push({
+      priority: 'high',
+      action: 'Update router firmware and disable UPnP',
+      details: 'Router vulnerabilities can expose entire network. UPnP can be exploited for port forwarding.',
+      howTo: 'Log into router admin > Firmware Update. Disable UPnP in Advanced Settings.'
+    });
+  }
+
+  // Always add some baseline recommendations
+  if (analysis.recommendations.length === 0) {
+    analysis.recommendations.push({
+      priority: 'low',
+      action: 'Maintain regular security monitoring',
+      details: 'Device appears secure but continuous monitoring is recommended.',
+      howTo: 'Schedule periodic security scans and review access logs regularly.'
+    });
+  }
+
+  analysis.recommendations.push({
+    priority: 'medium',
+    action: 'Implement network segmentation',
+    details: 'Isolate IoT devices on separate VLAN to limit lateral movement if compromised.',
+    howTo: 'Configure router/switch to create IoT VLAN, set up firewall rules between segments'
+  });
+
+  // Calculate updated risk score
+  analysis.riskAssessment.score = calculateRiskScore(vulnerabilities, ports);
+
+  return analysis;
+}
 
 // Get AI report for a device
 router.get('/report/:deviceId', authenticate, (req, res) => {
@@ -135,7 +448,7 @@ router.post('/analyze-network', authenticate, async (req, res) => {
 
     // Get all devices
     const devices = db.prepare('SELECT * FROM devices WHERE status != ?').all('offline');
-    
+
     // Get all open vulnerabilities
     const vulnerabilities = db.prepare("SELECT * FROM vulnerabilities WHERE status = 'open'").all();
 
@@ -158,91 +471,6 @@ router.post('/analyze-network', authenticate, async (req, res) => {
   }
 });
 
-// Helper function to perform AI analysis
-function performAIAnalysis(device, vulnerabilities, ports, analysisType) {
-  const analysis = {
-    summary: '',
-    riskAssessment: {
-      score: device.risk_score || 0,
-      level: device.risk_level || 'unknown',
-      factors: []
-    },
-    vulnerabilities: {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-      details: []
-    },
-    recommendations: [],
-    portAnalysis: [],
-    timestamp: new Date().toISOString()
-  };
-
-  // Count vulnerabilities by severity
-  for (const vuln of vulnerabilities) {
-    analysis.vulnerabilities[vuln.severity]++;
-    analysis.vulnerabilities.details.push({
-      cveId: vuln.cve_id,
-      title: vuln.title,
-      severity: vuln.severity,
-      cvssScore: vuln.cvss_score
-    });
-  }
-
-  // Analyze ports
-  const riskyPorts = [21, 23, 135, 139, 445, 3389];
-  for (const port of ports) {
-    const isRisky = riskyPorts.includes(port.port_number);
-    analysis.portAnalysis.push({
-      port: port.port_number,
-      service: port.service_name,
-      status: port.status,
-      risk: isRisky ? 'high' : 'low'
-    });
-    if (isRisky && port.status === 'open') {
-      analysis.riskAssessment.factors.push(`Risky port ${port.port_number} (${port.service_name}) is open`);
-    }
-  }
-
-  // Generate summary
-  if (analysis.vulnerabilities.critical > 0) {
-    analysis.summary = `Device "${device.name}" has ${analysis.vulnerabilities.critical} critical vulnerabilities requiring immediate attention.`;
-    analysis.riskAssessment.factors.push(`${analysis.vulnerabilities.critical} critical vulnerabilities`);
-  } else if (analysis.vulnerabilities.high > 0) {
-    analysis.summary = `Device "${device.name}" has ${analysis.vulnerabilities.high} high-severity vulnerabilities that should be addressed.`;
-    analysis.riskAssessment.factors.push(`${analysis.vulnerabilities.high} high-severity vulnerabilities`);
-  } else {
-    analysis.summary = `Device "${device.name}" has a relatively low risk profile.`;
-  }
-
-  // Generate recommendations
-  if (analysis.vulnerabilities.critical > 0) {
-    analysis.recommendations.push({
-      priority: 'critical',
-      action: 'Patch critical vulnerabilities immediately',
-      details: 'Critical vulnerabilities can be exploited remotely and may lead to complete system compromise.'
-    });
-  }
-
-  if (ports.some(p => p.port_number === 23 && p.status === 'open')) {
-    analysis.recommendations.push({
-      priority: 'high',
-      action: 'Disable Telnet and use SSH instead',
-      details: 'Telnet transmits data in plaintext, making it vulnerable to eavesdropping.'
-    });
-  }
-
-  if (device.firmware_version && device.firmware_version.includes('1.0')) {
-    analysis.recommendations.push({
-      priority: 'medium',
-      action: 'Update device firmware',
-      details: 'Older firmware versions may contain known vulnerabilities.'
-    });
-  }
-
-  return analysis;
-}
 
 // Helper function to generate chat responses
 function generateChatResponse(message, context) {

@@ -1,18 +1,24 @@
-const WebSocket = require('ws');
+const { Server } = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const logger = require('../utils/logger');
 
-let wss = null;
+let io = null;
 const clients = new Map();
 
 function initializeWebSocket(server) {
-  wss = new WebSocket.Server({ server, path: '/ws' });
+  io = new Server(server, {
+    cors: {
+      origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
+      methods: ['GET', 'POST'],
+      credentials: true
+    }
+  });
 
-  wss.on('connection', (ws, req) => {
+  io.on('connection', (socket) => {
     const clientId = uuidv4();
     clients.set(clientId, {
-      ws,
+      socket,
       subscriptions: new Set(),
       authenticated: false,
       userId: null
@@ -20,72 +26,58 @@ function initializeWebSocket(server) {
 
     logger.info(`WebSocket client connected: ${clientId}`);
 
-    // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'connected',
-      clientId,
-      message: 'Connected to Black Codex WebSocket server'
-    }));
-
-    // Try authenticate from query param token if present
-    try {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      const token = url.searchParams.get('token');
-      if (token) {
-        // perform authentication
-        handleAuthenticate(clientId, token);
-      }
-    } catch (e) {
-      // ignore URL parse errors
+    // Try authenticate from handshake auth token
+    const token = socket.handshake.auth?.token;
+    if (token) {
+      handleAuthenticate(clientId, token);
     }
 
-    ws.on('message', (message) => {
-      try {
-        const data = JSON.parse(message);
-        handleMessage(clientId, data);
-      } catch (error) {
-        logger.error('WebSocket message error:', error);
-        try {
-          ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format' }));
-        } catch (e) {
-          logger.error('Failed to send error message to client', e);
-        }
-      }
+    // Send welcome message
+    socket.emit('connected', {
+      clientId,
+      message: 'Connected to Black Codex WebSocket server'
     });
-    ws.on('close', () => {
+
+    // Handle authentication
+    socket.on('authenticate', (data) => {
+      handleAuthenticate(clientId, data?.token || data);
+    });
+
+    // Handle subscribe events (socket.io style)
+    socket.on('subscribe:devices', () => handleSubscribe(clientId, 'devices'));
+    socket.on('subscribe:alerts', () => handleSubscribe(clientId, 'alerts'));
+    socket.on('subscribe:scan', () => handleSubscribe(clientId, 'scan'));
+    socket.on('subscribe:scans', () => handleSubscribe(clientId, 'scans'));
+    socket.on('subscribe:packets', () => handleSubscribe(clientId, 'packets'));
+    socket.on('subscribe:system', () => handleSubscribe(clientId, 'system'));
+
+    // Generic subscribe handler
+    socket.on('subscribe', (data) => {
+      handleSubscribe(clientId, data?.channel || data);
+    });
+
+    // Generic unsubscribe handler
+    socket.on('unsubscribe', (data) => {
+      handleUnsubscribe(clientId, data?.channel || data);
+    });
+
+    // Ping handler
+    socket.on('ping', () => {
+      socket.emit('pong', { timestamp: Date.now() });
+    });
+
+    socket.on('disconnect', () => {
       clients.delete(clientId);
       logger.info(`WebSocket client disconnected: ${clientId}`);
     });
 
-    ws.on('error', (error) => {
+    socket.on('error', (error) => {
       logger.error(`WebSocket error for client ${clientId}:`, error);
     });
   });
 
   logger.info('WebSocket server initialized');
-  return wss;
-}
-
-function handleMessage(clientId, data) {
-  const client = clients.get(clientId);
-  if (!client) return;
-
-  switch (data.type) {
-    case 'authenticate':
-      handleAuthenticate(clientId, data.token);
-      break;
-    case 'subscribe':
-      handleSubscribe(clientId, data.channel);
-      break;
-    case 'unsubscribe':
-      handleUnsubscribe(clientId, data.channel);
-      break;
-    case 'ping':
-      client.ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
-      break;
-    default:
-      client.ws.send(JSON.stringify({ type: 'error', message: 'Unknown message type' }));
-  }
+  return io;
 }
 
 function handleAuthenticate(clientId, token) {
@@ -97,18 +89,16 @@ function handleAuthenticate(clientId, token) {
     client.authenticated = true;
     client.userId = decoded.userId;
 
-    client.ws.send(JSON.stringify({
-      type: 'authenticated',
+    client.socket.emit('authenticated', {
       userId: decoded.userId,
       message: 'Authentication successful'
-    }));
+    });
 
     logger.info(`WebSocket client ${clientId} authenticated as user ${decoded.userId}`);
   } catch (error) {
-    client.ws.send(JSON.stringify({
-      type: 'error',
+    client.socket.emit('error', {
       message: 'Authentication failed'
-    }));
+    });
   }
 }
 
@@ -120,19 +110,21 @@ function handleSubscribe(clientId, channel) {
   const protectedChannels = new Set(['devices', 'scans', 'packets', 'system']);
 
   if (!validChannels.includes(channel)) {
-    client.ws.send(JSON.stringify({ type: 'error', message: `Invalid channel: ${channel}` }));
+    client.socket.emit('error', { message: `Invalid channel: ${channel}` });
     return;
   }
 
   // Require authentication for protected channels
   if (protectedChannels.has(channel) && !client.authenticated) {
-    client.ws.send(JSON.stringify({ type: 'error', message: `Authentication required to subscribe to ${channel}` }));
+    client.socket.emit('error', { message: `Authentication required to subscribe to ${channel}` });
     logger.warn(`Client ${clientId} denied subscription to protected channel ${channel}`);
     return;
   }
 
+  // Join the socket.io room for this channel
+  client.socket.join(channel);
   client.subscriptions.add(channel);
-  client.ws.send(JSON.stringify({ type: 'subscribed', channel, message: `Subscribed to ${channel}` }));
+  client.socket.emit('subscribed', { channel, message: `Subscribed to ${channel}` });
   logger.info(`Client ${clientId} subscribed to ${channel}`);
 }
 
@@ -140,74 +132,62 @@ function handleUnsubscribe(clientId, channel) {
   const client = clients.get(clientId);
   if (!client) return;
 
+  client.socket.leave(channel);
   client.subscriptions.delete(channel);
-  client.ws.send(JSON.stringify({
-    type: 'unsubscribed',
+  client.socket.emit('unsubscribed', {
     channel,
     message: `Unsubscribed from ${channel}`
-  }));
+  });
 
   logger.info(`Client ${clientId} unsubscribed from ${channel}`);
 }
 
 // Broadcast to all clients subscribed to a channel
 function broadcast(channel, data) {
-  const message = JSON.stringify({
-    type: 'broadcast',
+  if (!io) return;
+
+  const protectedChannels = new Set(['devices', 'scans', 'packets', 'system']);
+
+  // For protected channels, we need to check authentication
+  if (protectedChannels.has(channel)) {
+    // Emit to authenticated clients in the room only
+    clients.forEach((client) => {
+      if (client.authenticated && client.subscriptions.has(channel)) {
+        client.socket.emit(channel, data);
+      }
+    });
+  } else {
+    // For non-protected channels, emit to the room directly
+    io.to(channel).emit(channel, data);
+  }
+
+  // Also emit as generic 'broadcast' event for backward compatibility
+  io.to(channel).emit('broadcast', {
     channel,
     data,
     timestamp: new Date().toISOString()
   });
-
-  const protectedChannels = new Set(['devices', 'scans', 'packets', 'system']);
-
-  clients.forEach((client, clientId) => {
-    // If channel is protected, only send to authenticated clients
-    if (!client.subscriptions.has(channel) || client.ws.readyState !== WebSocket.OPEN) return;
-    if (protectedChannels.has(channel) && !client.authenticated) return;
-    try {
-      client.ws.send(message);
-    } catch (error) {
-      logger.error(`Failed to send to client ${clientId}:`, error);
-    }
-  });
 }
 
-// Broadcast to all authenticated clients
+// Broadcast to all connected clients
 function broadcastToAll(data) {
-  const message = JSON.stringify({
-    type: 'broadcast',
+  if (!io) return;
+
+  io.emit('broadcast', {
     channel: 'all',
     data,
     timestamp: new Date().toISOString()
-  });
-
-  clients.forEach((client, clientId) => {
-    if (client.ws.readyState === WebSocket.OPEN) {
-      try {
-        client.ws.send(message);
-      } catch (error) {
-        logger.error(`Failed to send to client ${clientId}:`, error);
-      }
-    }
   });
 }
 
 // Send to specific user
 function sendToUser(userId, data) {
-  const message = JSON.stringify({
-    type: 'direct',
-    data,
-    timestamp: new Date().toISOString()
-  });
-
-  clients.forEach((client, clientId) => {
-    if (client.userId === userId && client.ws.readyState === WebSocket.OPEN) {
-      try {
-        client.ws.send(message);
-      } catch (error) {
-        logger.error(`Failed to send to user ${userId}:`, error);
-      }
+  clients.forEach((client) => {
+    if (client.userId === userId) {
+      client.socket.emit('direct', {
+        data,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 }
@@ -217,6 +197,8 @@ const emit = {
   // Alert events
   newAlert: (alert) => {
     broadcast('alerts', { event: 'new_alert', alert });
+    // Also emit specific event name for socket.io style listeners
+    if (io) io.to('alerts').emit('alert_created', alert);
   },
   alertAcknowledged: (alertId) => {
     broadcast('alerts', { event: 'alert_acknowledged', alertId });
@@ -225,32 +207,54 @@ const emit = {
   // Device events
   deviceOnline: (device) => {
     broadcast('devices', { event: 'device_online', device });
+    if (io) io.to('devices').emit('device_connected', device);
   },
   deviceOffline: (device) => {
     broadcast('devices', { event: 'device_offline', device });
+    if (io) io.to('devices').emit('device_disconnected', device);
   },
   deviceUpdated: (device) => {
     broadcast('devices', { event: 'device_updated', device });
+    if (io) io.to('devices').emit('device_updated', device);
   },
   deviceQuarantined: (device) => {
     broadcast('devices', { event: 'device_quarantined', device });
   },
   newDevice: (device) => {
     broadcast('devices', { event: 'new_device', device });
+    if (io) io.to('devices').emit('device_connected', device);
   },
 
   // Scan events
   scanStarted: (scan) => {
     broadcast('scans', { event: 'scan_started', scan });
+    broadcast('scan', { event: 'scan_started', scan });
+    if (io) {
+      io.to('scans').emit('scan_started', scan);
+      io.to('scan').emit('scan_started', scan);
+    }
   },
   scanProgress: (scanId, progress) => {
-    broadcast('scans', { event: 'scan_progress', scanId, progress });
+    // Handle both simple progress and full data object
+    const data = typeof progress === 'object' ? { scanId, ...progress } : { scanId, progress };
+    broadcast('scans', { event: 'scan_progress', ...data });
+    broadcast('scan', { event: 'scan_progress', ...data });
+    if (io) {
+      io.to('scans').emit('scan_progress', data);
+      io.to('scan').emit('scan_progress', data);
+    }
   },
   scanCompleted: (scan) => {
     broadcast('scans', { event: 'scan_completed', scan });
+    broadcast('scan', { event: 'scan_completed', scan });
+    if (io) {
+      io.to('scans').emit('scan_completed', scan);
+      io.to('scan').emit('scan_completed', scan);
+    }
   },
   scanFailed: (scanId, error) => {
     broadcast('scans', { event: 'scan_failed', scanId, error });
+    broadcast('scan', { event: 'scan_failed', scanId, error });
   },
 
   // Packet events
