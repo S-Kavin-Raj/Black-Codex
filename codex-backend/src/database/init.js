@@ -129,7 +129,6 @@ async function initializeDatabase() {
       status TEXT DEFAULT 'online',
       risk_score INTEGER DEFAULT 0,
       risk_level TEXT DEFAULT 'safe',
-      risk_level TEXT DEFAULT 'safe',
       first_seen TEXT DEFAULT CURRENT_TIMESTAMP,
       last_seen TEXT,
       discovered_at TEXT DEFAULT CURRENT_TIMESTAMP,
