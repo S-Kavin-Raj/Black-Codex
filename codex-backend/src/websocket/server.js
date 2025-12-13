@@ -30,6 +30,9 @@ function initializeWebSocket(server) {
     const token = socket.handshake.auth?.token;
     if (token) {
       handleAuthenticate(clientId, token);
+    } else if (process.env.NODE_ENV === 'development') {
+      // Auto-authenticate in dev mode if no token provided
+      handleAuthenticate(clientId, 'dev-token');
     }
 
     // Send welcome message
@@ -84,18 +87,37 @@ function handleAuthenticate(clientId, token) {
   const client = clients.get(clientId);
   if (!client) return;
 
+  // Allow dev mode bypass (same as HTTP middleware)
+  if (process.env.NODE_ENV === 'development' || token === 'dev-token') {
+    client.authenticated = true;
+    client.userId = 'dev';
+    client.socket.emit('authenticated', {
+      userId: 'dev',
+      message: 'Authentication successful (dev mode)'
+    });
+    logger.info(`WebSocket client ${clientId} authenticated in dev mode`);
+    return;
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     client.authenticated = true;
-    client.userId = decoded.userId;
+    client.userId = decoded.userId || decoded.id;
 
     client.socket.emit('authenticated', {
-      userId: decoded.userId,
+      userId: decoded.userId || decoded.id,
       message: 'Authentication successful'
     });
 
-    logger.info(`WebSocket client ${clientId} authenticated as user ${decoded.userId}`);
+    logger.info(`WebSocket client ${clientId} authenticated as user ${decoded.userId || decoded.id}`);
   } catch (error) {
+    // In dev mode, still allow connection but log the error
+    if (process.env.NODE_ENV === 'development') {
+      client.authenticated = true;
+      client.userId = 'dev';
+      logger.warn(`WebSocket auth failed in dev mode, allowing connection: ${error.message}`);
+      return;
+    }
     client.socket.emit('error', {
       message: 'Authentication failed'
     });

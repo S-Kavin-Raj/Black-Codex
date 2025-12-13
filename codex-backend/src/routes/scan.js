@@ -333,7 +333,7 @@ async function runFullScan(scanId, subnet, userId) {
 
       db.prepare('UPDATE scans SET progress = ? WHERE id = ?').run(progress, scanId);
 
-      // Broadcast detailed progress via WebSocket
+      // Broadcast detailed progress via WebSocket (channel-based)
       broadcast('scan', {
         type: 'scan_progress',
         scanId,
@@ -345,7 +345,7 @@ async function runFullScan(scanId, subnet, userId) {
         timeLeft
       });
 
-      // Also emit as direct scan_progress event for frontend listeners
+      // Also emit as direct scan_progress event for frontend socket.on('scan_progress') listeners
       if (emit && emit.scanProgress) {
         emit.scanProgress(scanId, {
           progress,

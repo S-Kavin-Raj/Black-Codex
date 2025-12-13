@@ -59,6 +59,30 @@ const MAC_VENDORS = {
   'AC:CF:85': 'HUAWEI',
   '00:0C:29': 'VMware',
   '00:1C:B3': 'Apple',
+  // User's network MAC prefixes (added for accurate detection)
+  'E4:3A:6E': 'Shenzhen Zeroone Technology',
+  '20:15:DE': 'Samsung',
+  'A8:1E:84': 'Quanta Computer',
+  'B4:B5:2F': 'HP',
+  '2C:58:B9': 'HP',
+  'CC:28:AA': 'ASUS',
+  'D0:AD:08': 'HP',
+  '10:E7:C6': 'HP',
+  '04:BF:1B': 'Dell',
+  '64:6D:6C': 'Huawei',
+  'C0:25:2F': 'Mercury (TP-Link)',
+  '10:BD:18': 'Cisco',
+  '00:0F:E0': 'NComputing',
+  'A0:F8:49': 'ChangYang Tech',
+  '00:8E:73': 'Cisco-Meraki',
+  'C0:C9:E3': 'HP',
+  '04:5F:B9': 'Liteon Technology',
+  '00:17:88': 'Philips Lighting',
+  '94:10:3E': 'Belkin International',
+  '68:A4:0E': 'BSH Hausgeräte',
+  'AC:CF:85': 'HUAWEI',
+  '00:0C:29': 'VMware',
+  '00:1C:B3': 'Apple',
   'F4:F5:D8': 'Google',
   '30:FD:38': 'Google',
   '00:04:4B': 'Nvidia',
@@ -429,9 +453,6 @@ function calculateSubnet(ip, netmask) {
   return `${network}/${cidr}`;
 }
 
-/**
- * Get IP range from subnet
- */
 function getIPRange(subnet) {
   const [baseIP, cidr] = subnet.split('/');
   const parts = baseIP.split('.').map(Number);
@@ -589,8 +610,9 @@ async function arpScan() {
 
 /**
  * Ping a single IP address
+ * Increased timeout to 2000ms for better accuracy with slow devices
  */
-async function pingHost(ip, timeout = 1000) {
+async function pingHost(ip, timeout = 2000) {
   const platform = os.platform();
 
   try {
@@ -612,6 +634,35 @@ async function pingHost(ip, timeout = 1000) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Check if device is alive using ping + TCP port probe fallback
+ * Solves issue where devices block ICMP but are still online
+ */
+async function isDeviceAlive(ip, timeout = 3000) {
+  // Try ping first (fastest method)
+  if (await pingHost(ip, timeout)) {
+    return true;
+  }
+
+  // Fallback: Try TCP connection to common ports
+  // Many IoT devices block ICMP but have web interfaces or SSH
+  const probePorts = [80, 443, 22, 23, 8080, 554];
+
+  for (const port of probePorts) {
+    try {
+      const result = await scanPort(ip, port, 1000);
+      if (result.open) {
+        logger.info(`Device ${ip} alive via port ${port} (ping failed)`);
+        return true;
+      }
+    } catch {
+      // Continue to next port
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -937,24 +988,36 @@ async function fullNetworkScan(subnet, progressCallback) {
   if (progressCallback) progressCallback(5, 'Running ARP scan...');
   const arpDevices = await arpScan();
 
-  // Step 2: Also ping sweep the subnet for devices not in ARP cache
+  // Step 2: Ping sweep the subnet for devices not in ARP cache
+  // Now scans ALL IPs in batches (removed 50 IP limit for accuracy)
   if (progressCallback) progressCallback(15, 'Running ping sweep...');
   const ipRange = getIPRange(subnet);
   const discoveredIPs = new Set(arpDevices.map(d => d.ip));
 
-  // Ping unknown IPs (limited to avoid long scans)
-  const unknownIPs = ipRange.filter(ip => !discoveredIPs.has(ip)).slice(0, 50);
-  const pingResults = await Promise.all(
-    unknownIPs.map(async (ip) => {
-      const alive = await pingHost(ip);
-      return alive ? ip : null;
-    })
-  );
+  // Get all unknown IPs (no limit - scan entire subnet for accuracy)
+  const unknownIPs = ipRange.filter(ip => !discoveredIPs.has(ip));
+  logger.info(`Ping sweeping ${unknownIPs.length} IPs not in ARP cache...`);
 
-  // Add pinged devices
-  for (const ip of pingResults.filter(Boolean)) {
-    if (!discoveredIPs.has(ip)) {
-      arpDevices.push({ ip, mac: null, type: 'ping' });
+  // Process in batches of 50 for performance
+  const batchSize = 50;
+  for (let i = 0; i < unknownIPs.length; i += batchSize) {
+    const batch = unknownIPs.slice(i, i + batchSize);
+    const batchProgress = 15 + Math.floor((i / unknownIPs.length) * 5);
+    if (progressCallback) progressCallback(batchProgress, `Ping sweep batch ${Math.floor(i / batchSize) + 1}...`);
+
+    const pingResults = await Promise.all(
+      batch.map(async (ip) => {
+        const alive = await pingHost(ip);
+        return alive ? ip : null;
+      })
+    );
+
+    // Add discovered devices from this batch
+    for (const ip of pingResults.filter(Boolean)) {
+      if (!discoveredIPs.has(ip)) {
+        arpDevices.push({ ip, mac: null, type: 'ping' });
+        discoveredIPs.add(ip);
+      }
     }
   }
 
@@ -979,9 +1042,11 @@ async function fullNetworkScan(subnet, progressCallback) {
 
     try {
       // IMPORTANT: Verify device is actually alive before including it
-      const isAlive = await pingHost(arpDevice.ip, 1500);
-      if (!isAlive) {
-        logger.info(`Device ${arpDevice.ip} is not responding, skipping`);
+      // Uses isDeviceAlive which tries ping first, then TCP port probe fallback
+      // This catches devices that block ICMP but are still online
+      const alive = await isDeviceAlive(arpDevice.ip, 3000);
+      if (!alive) {
+        logger.info(`Device ${arpDevice.ip} is not responding to ping or TCP probes, skipping`);
         continue; // Skip this device - it's not currently connected
       }
 
@@ -1105,7 +1170,7 @@ async function fullNetworkScan(subnet, progressCallback) {
       const deviceVulns = await checkDeviceVulnerabilities(device);
       if (deviceVulns && deviceVulns.length > 0) {
         for (const vuln of deviceVulns) {
-          allVulnerabilities.push({
+          const vulnData = {
             id: uuidv4(),
             name: vuln.title,
             severity: vuln.severity,
@@ -1114,9 +1179,54 @@ async function fullNetworkScan(subnet, progressCallback) {
             host: device.ip,
             port: vuln.port || (device.openPorts.length > 0 ? device.openPorts[0] : null),
             hostname: device.hostname
-          });
+          };
+          allVulnerabilities.push(vulnData);
+
+          // REAL-TIME: Broadcast each vulnerability as it's discovered
+          try {
+            const { broadcast } = require('../websocket/server');
+            broadcast('scan', {
+              type: 'vulnerability_found',
+              vulnerability: vulnData,
+              totalVulns: allVulnerabilities.length,
+              timestamp: new Date().toISOString()
+            });
+            logger.info(`[REAL-TIME] Broadcasted vulnerability: ${vuln.title} on ${device.ip}`);
+          } catch (broadcastErr) {
+            logger.error('Failed to broadcast vulnerability:', broadcastErr.message);
+          }
         }
         totalVulnsFound += deviceVulns.length;
+      }
+
+      // Broadcast device discovery in real-time via WebSocket
+      try {
+        const { broadcast } = require('../websocket/server');
+        const deviceData = {
+          id: device.id,
+          name: device.hostname || `Device ${device.ip}`,
+          ip: device.ip,
+          mac: device.mac,
+          type: device.deviceType,
+          vendor: device.vendor,
+          manufacturer: device.vendor,
+          device_type: device.deviceType,
+          status: device.status,
+          risk_score: device.riskScore,
+          risk_level: device.riskLevel,
+          last_seen: device.lastSeen,
+          open_ports: JSON.stringify(device.openPorts)
+        };
+
+        // Broadcast to devices channel
+        broadcast('devices', {
+          event: 'device_updated',
+          device: deviceData
+        });
+
+        logger.info(`Broadcasted device update for ${device.ip}`);
+      } catch (broadcastErr) {
+        logger.error('Failed to broadcast device update:', broadcastErr.message);
       }
 
     } catch (error) {
@@ -1139,6 +1249,7 @@ async function fullNetworkScan(subnet, progressCallback) {
     summary: {
       total: devices.length,
       online: devices.length,
+      portsChecked: totalPortsChecked,
       critical: devices.filter(d => d.riskLevel === 'critical').length,
       high: devices.filter(d => d.riskLevel === 'high').length,
       medium: devices.filter(d => d.riskLevel === 'medium').length,
@@ -1658,6 +1769,7 @@ module.exports = {
   refreshDevices,
   arpScan,
   pingHost,
+  isDeviceAlive,
   scanPorts,
   scanPort,
   checkPort,
