@@ -1,58 +1,130 @@
 /**
  * AI Analysis & Remediation Suggestion Service
- * Uses GPT-4 or local LLM (Ollama) for explainability
+ * Uses Google Gemini AI for explainability and vulnerability analysis
  */
 const { getDatabase } = require('../database/init');
 const { v4: uuidv4 } = require('uuid');
 const fetch = require('node-fetch');
 const logger = require('../utils/logger');
 
-// Example: Use OpenAI API or local Ollama
-const OPENAI_API_URL = process.env.OPENAI_API_URL || 'http://localhost:11434/v1/chat/completions';
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+// Google Gemini API Configuration
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyA5iXPWGGjL_ayT5sjjs6lpeaI84tsaEa4';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+/**
+ * Call Google Gemini AI Engine
+ */
 async function callAIEngine(prompt) {
-  // Use local Ollama or OpenAI
   try {
-    const res = await fetch(OPENAI_API_URL, {
+    logger.info('[AI] Calling Gemini AI...');
+
+    const res = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        ...(OPENAI_API_KEY ? { 'Authorization': `Bearer ${OPENAI_API_KEY}` } : {})
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 512,
-        temperature: 0.2
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024
+        },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+        ]
       })
     });
+
     const data = await res.json();
-    // OpenAI: data.choices[0].message.content
-    // Ollama: data.message.content
-    return data.choices?.[0]?.message?.content || data.message?.content || '';
+
+    // Extract text from Gemini response
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      const responseText = data.candidates[0].content.parts[0].text;
+      logger.info('[AI] Gemini response received successfully');
+      return responseText;
+    } else if (data.error) {
+      logger.error(`[AI] Gemini API error: ${data.error.message}`);
+      throw new Error(data.error.message);
+    } else {
+      logger.warn('[AI] Unexpected Gemini response format');
+      throw new Error('Unexpected response format from Gemini');
+    }
   } catch (err) {
     logger.error(`[AI] Engine call failed: ${err.message}`);
     // Fallback for demo/offline mode so the user sees the feature working
-    return `**Analysis (Offline Mode)**\n\nBased on heuristics (AI service unavailable):\n1. **Use Strong Passwords**: Ensure all accounts use complex passwords.\n2. **Close Unused Ports**: Port ${prompt.match(/Open Ports: (.*)/)?.[1] || 'detected'} should be closed if not in use.\n3. **Update Firmware**: Check vendor site for updates.\n\nSummary: Device shows potential risks due to exposed services. Immediate hardening recommended.`;
+    const portsMatch = prompt.match(/Open Ports: (.*)/);
+    const ports = portsMatch ? portsMatch[1] : 'unknown ports';
+
+    return `**Security Analysis (Offline Mode)**
+
+⚠️ AI service temporarily unavailable. Here are general security recommendations:
+
+**Immediate Actions:**
+1. **Review Open Ports**: Ports ${ports} were detected. Close any that are not essential.
+2. **Update Firmware/Software**: Check vendor website for security patches.
+3. **Change Default Credentials**: Ensure all default passwords have been changed.
+4. **Enable Firewall**: Block unnecessary incoming connections.
+
+**Medium Priority:**
+5. **Enable Encryption**: Use HTTPS/TLS for all web services.
+6. **Implement Network Segmentation**: Isolate IoT devices from main network.
+7. **Regular Monitoring**: Set up alerts for unusual activity.
+
+**Summary:** This device has potential security risks due to exposed services. Immediate review and hardening is recommended to prevent unauthorized access.`;
   }
 }
 
+/**
+ * Analyze a device and generate AI-powered remediation suggestions
+ */
 async function analyzeDevice(ip) {
   const db = getDatabase();
   const device = db.prepare('SELECT * FROM devices WHERE ip = ?').get(ip);
   if (!device) throw new Error('Device not found');
+
   const ports = device.open_ports ? JSON.parse(device.open_ports) : [];
   const vulns = db.prepare('SELECT * FROM vulnerabilities WHERE device_id = ?').all(device.id);
   const misconfigs = db.prepare('SELECT * FROM misconfigurations WHERE device_id = ?').all(device.id);
 
-  // Build prompt
-  const prompt = `You are a cybersecurity expert. Given the following device info, open ports, vulnerabilities, and misconfigurations, provide short actionable remediation steps, priority, and simple how-to links.\n\nDevice: ${device.name} (${device.ip})\nType: ${device.type}\nVendor: ${device.vendor}\nOpen Ports: ${ports.map(p => p.port || p).join(', ')}\nVulnerabilities: ${vulns.map(v => v.title || v.cve_id).join(', ')}\nMisconfigurations: ${misconfigs.map(m => m.title).join(', ')}\n\nOutput format:\n- Priority list of remediation steps\n- For each, a short how-to link\n- Summary paragraph`;
+  // Build detailed prompt for Gemini
+  const prompt = `You are a cybersecurity expert analyzing an IoT/network device for vulnerabilities.
+
+**Device Information:**
+- Name: ${device.name || 'Unknown'}
+- IP Address: ${device.ip}
+- Type: ${device.device_type || device.type || 'Unknown'}
+- Vendor/Manufacturer: ${device.vendor || device.manufacturer || 'Unknown'}
+- MAC Address: ${device.mac || 'Unknown'}
+- Risk Score: ${device.risk_score || 'Not calculated'}
+
+**Open Ports Detected:** ${ports.length > 0 ? ports.map(p => typeof p === 'object' ? `${p.port} (${p.service || 'unknown'})` : p).join(', ') : 'None detected'}
+
+**Known Vulnerabilities:** ${vulns.length > 0 ? vulns.map(v => v.title || v.cve_id || 'Unknown').join(', ') : 'None recorded'}
+
+**Misconfigurations:** ${misconfigs.length > 0 ? misconfigs.map(m => m.title).join(', ') : 'None recorded'}
+
+Please provide:
+1. **Risk Assessment**: Overall risk level (Critical/High/Medium/Low) with explanation
+2. **Vulnerability Analysis**: Explain each security concern found
+3. **Remediation Steps**: Numbered list of specific actions to fix each issue
+4. **Priority Order**: Which fixes should be done first
+5. **How-To Links**: General guidance or search terms to find solutions
+
+Format your response clearly with headers and bullet points.`;
 
   const aiResult = await callAIEngine(prompt);
-  const summary = aiResult.split('\n').slice(0, 2).join(' ');
+  const summary = aiResult.split('\n').slice(0, 3).join(' ').substring(0, 200) + '...';
 
-  // Save report
+  // Save report to database
   const reportId = uuidv4();
   db.prepare(`
     INSERT INTO ai_reports (id, device_id, ip, analysis_type, report_data, summary, created_at)
@@ -66,9 +138,14 @@ async function analyzeDevice(ip) {
     summary,
     new Date().toISOString()
   );
-  return { reportId, summary };
+
+  logger.info(`[AI] Report generated for device ${ip}, reportId: ${reportId}`);
+  return { reportId, summary, fullReport: aiResult };
 }
 
+/**
+ * Get a previously generated AI report
+ */
 function getReport(reportId) {
   const db = getDatabase();
   const report = db.prepare('SELECT * FROM ai_reports WHERE id = ?').get(reportId);
@@ -77,5 +154,6 @@ function getReport(reportId) {
 
 module.exports = {
   analyzeDevice,
-  getReport
+  getReport,
+  callAIEngine
 };
