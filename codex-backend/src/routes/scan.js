@@ -6,7 +6,7 @@ const { logAudit } = require('../middleware/audit');
 const { broadcast, emit } = require('../websocket/server');
 const RealScanner = require('../services/realNetworkScanner');
 const logger = require('../utils/logger');
-const { getLatestNetworkScore, getScoreTrends } = require('../services/securityScore');
+const { getLatestNetworkScore, getScoreTrends, storeDeviceScore, storeNetworkScore, calculateDeviceScore } = require('../services/securityScore');
 const { analyzeDevice, getReport } = require('../services/aiAnalysis');
 
 const router = express.Router();
@@ -384,6 +384,36 @@ async function runFullScan(scanId, subnet, userId) {
     );
 
     saveDatabase();
+
+    // Calculate and store security scores for all scanned devices
+    try {
+      logger.info(`[SECURITY SCORE] Calculating scores for ${result.devices.length} devices...`);
+
+      for (const device of result.devices) {
+        // Get device's vulnerabilities
+        const deviceVulns = (result.vulnerabilities || []).filter(v => v.host === device.ip);
+
+        // Store device score
+        storeDeviceScore({
+          id: device.id,
+          open_ports: JSON.stringify(device.openPorts || []),
+          has_weak_credentials: device.hasWeakCredentials || false
+        }, deviceVulns, scanId);
+      }
+
+      // Store aggregate network score
+      const networkScore = storeNetworkScore(scanId);
+      logger.info(`[SECURITY SCORE] Network score calculated: ${networkScore.networkScore}/100`);
+
+      // Broadcast the new security score
+      broadcast('scan', {
+        type: 'security_score_updated',
+        score: networkScore.networkScore,
+        scanId
+      });
+    } catch (scoreErr) {
+      logger.error('[SECURITY SCORE] Error calculating scores:', scoreErr.message);
+    }
 
     activeScan = {
       id: scanId,

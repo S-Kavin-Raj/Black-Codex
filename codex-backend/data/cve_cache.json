@@ -2029,5 +2029,285 @@
       "exploitAvailable": false,
       "patchAvailable": false
     }
+  ],
+  "ncomputing::unknown": [],
+  "cisco-meraki::unknown": [],
+  "liteon technology::unknown": [],
+  "mercury (tp-link)::unknown": [],
+  "dell::unknown": [
+    {
+      "id": "CVE-2012-1844",
+      "published": "2012-03-22T10:17:11.127",
+      "lastModified": "2025-04-11T00:51:21.963",
+      "description": "The Quantum Scalar i500 tape library with firmware before i7.0.3 (604G.GS00100), also distributed as the Dell ML6000 tape library with firmware before A20-00 (590G.GS00100) and the IBM TS3310 tape library with firmware before R6C (606G.GS001), uses default passwords for unspecified user accounts, which makes it easier for remote attackers to obtain access via unknown vectors.",
+      "cvssScore": 7.5,
+      "cvssSeverity": null,
+      "cvssVector": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+      "references": [
+        "http://osvdb.org/80372",
+        "http://www.kb.cert.org/vuls/id/913483",
+        "http://www.kb.cert.org/vuls/id/MAPG-8NNKN8",
+        "http://www.kb.cert.org/vuls/id/MAPG-8NVRPY",
+        "http://www.kb.cert.org/vuls/id/MORO-8QNJLE",
+        "https://exchange.xforce.ibmcloud.com/vulnerabilities/74322",
+        "http://osvdb.org/80372",
+        "http://www.kb.cert.org/vuls/id/913483",
+        "http://www.kb.cert.org/vuls/id/MAPG-8NNKN8",
+        "http://www.kb.cert.org/vuls/id/MAPG-8NVRPY",
+        "http://www.kb.cert.org/vuls/id/MORO-8QNJLE",
+        "https://exchange.xforce.ibmcloud.com/vulnerabilities/74322"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    }
+  ],
+  "unknown::camera": [
+    {
+      "id": "CVE-2007-4233",
+      "published": "2007-08-08T22:17:00.000",
+      "lastModified": "2025-04-09T00:30:58.490",
+      "description": "Multiple unspecified vulnerabilities in Camera Life before 2.6 allow attackers to cause a denial of service via unknown vectors.",
+      "cvssScore": 4.3,
+      "cvssSeverity": null,
+      "cvssVector": "AV:N/AC:M/Au:N/C:N/I:N/A:P",
+      "references": [
+        "http://fdcl.svn.sourceforge.net/viewvc/%2Acheckout%2A/fdcl/trunk/Changelog",
+        "http://sourceforge.net/forum/forum.php?forum_id=721006",
+        "http://www.securityfocus.com/bid/25220",
+        "http://fdcl.svn.sourceforge.net/viewvc/%2Acheckout%2A/fdcl/trunk/Changelog",
+        "http://sourceforge.net/forum/forum.php?forum_id=721006",
+        "http://www.securityfocus.com/bid/25220"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2008-6993",
+      "published": "2009-08-19T05:24:52.657",
+      "lastModified": "2025-04-09T00:30:58.490",
+      "description": "Siemens Gigaset WLAN Camera 1.27 has an insecure default password, which allows remote attackers to conduct unauthorized activities. NOTE: the provenance of this information is unknown; the details are obtained solely from third party information.",
+      "cvssScore": 10,
+      "cvssSeverity": null,
+      "cvssVector": "AV:N/AC:L/Au:N/C:C/I:C/A:C",
+      "references": [
+        "http://www.securityfocus.com/bid/30973",
+        "http://www.securityfocus.com/bid/30973"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2010-4027",
+      "published": "2010-10-28T20:00:03.233",
+      "lastModified": "2025-04-11T00:51:21.963",
+      "description": "Unspecified vulnerability in the camera application in HP Palm webOS 1.4.1 allows local users to overwrite arbitrary files via unknown vectors.",
+      "cvssScore": 5.6,
+      "cvssSeverity": null,
+      "cvssVector": "AV:L/AC:H/Au:N/C:N/I:C/A:C",
+      "references": [
+        "http://marc.info/?l=bugtraq&m=128820226417721&w=2",
+        "http://secunia.com/advisories/42023",
+        "http://www.securitytracker.com/id?1024658",
+        "http://marc.info/?l=bugtraq&m=128820226417721&w=2",
+        "http://secunia.com/advisories/42023",
+        "http://www.securitytracker.com/id?1024658"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2019-25062",
+      "published": "2022-06-08T09:15:08.000",
+      "lastModified": "2024-11-21T04:39:51.860",
+      "description": "A vulnerability was found in Sricam IP CCTV Camera and classified as critical. This issue affects some unknown processing of the component Device Viewer. The manipulation leads to memory corruption. An attack has to be approached locally. The exploit has been disclosed to the public and may be used.",
+      "cvssScore": 5.3,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L",
+      "references": [
+        "https://vuldb.com/?id.159431",
+        "https://www.exploit-db.com/exploits/47477",
+        "https://vuldb.com/?id.159431",
+        "https://www.exploit-db.com/exploits/47477"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2019-25063",
+      "published": "2022-06-08T09:15:08.193",
+      "lastModified": "2024-11-21T04:39:52.017",
+      "description": "A vulnerability was found in Sricam IP CCTV Camera. It has been classified as critical. Affected is an unknown function of the component Device Viewer. The manipulation leads to memory corruption. Local access is required to approach this attack.",
+      "cvssScore": 5.3,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L",
+      "references": [
+        "https://vuldb.com/?id.159432",
+        "https://vuldb.com/?id.159432"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-2995",
+      "published": "2024-03-27T20:15:09.903",
+      "lastModified": "2024-11-21T09:11:00.897",
+      "description": "A vulnerability was found in NUUO Camera up to 20240319 and classified as problematic. This issue affects some unknown processing of the file /deletefile.php. The manipulation of the argument filename leads to denial of service. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. The identifier VDB-258197 was assigned to this vulnerability. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 5.4,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L",
+      "references": [
+        "https://h0e4a0r1t.github.io/2024/vulns/Arbitrary%20file%20deletion%20vulnerability%20exists%20in%20nuuo%20camera-deletefile.php.pdf",
+        "https://vuldb.com/?ctiid.258197",
+        "https://vuldb.com/?id.258197",
+        "https://vuldb.com/?submit.301068",
+        "https://h0e4a0r1t.github.io/2024/vulns/Arbitrary%20file%20deletion%20vulnerability%20exists%20in%20nuuo%20camera-deletefile.php.pdf",
+        "https://vuldb.com/?ctiid.258197",
+        "https://vuldb.com/?id.258197",
+        "https://vuldb.com/?submit.301068"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-3434",
+      "published": "2024-04-08T00:15:08.060",
+      "lastModified": "2024-11-21T09:29:35.903",
+      "description": "A vulnerability classified as critical was found in CP Plus Wi-Fi Camera up to 20240401. Affected by this vulnerability is an unknown functionality of the component User Management. The manipulation leads to improper authorization. The attack can be launched remotely. The exploit has been disclosed to the public and may be used. The associated identifier of this vulnerability is VDB-259615. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 5.4,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L",
+      "references": [
+        "https://drive.google.com/file/d/1-Fz3G5HQZxBNgeXjPfIR1bEeC_qAegWD/view?usp=sharing",
+        "https://vuldb.com/?ctiid.259615",
+        "https://vuldb.com/?id.259615",
+        "https://vuldb.com/?submit.308217",
+        "https://drive.google.com/file/d/1-Fz3G5HQZxBNgeXjPfIR1bEeC_qAegWD/view?usp=sharing",
+        "https://vuldb.com/?ctiid.259615",
+        "https://vuldb.com/?id.259615",
+        "https://vuldb.com/?submit.308217"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-5095",
+      "published": "2024-05-19T02:15:48.120",
+      "lastModified": "2024-11-21T09:46:57.340",
+      "description": "A vulnerability classified as problematic has been found in Victor Zsviot Camera 8.26.31. This affects an unknown part of the component MQTT Packet Handler. The manipulation leads to denial of service. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The identifier VDB-265077 was assigned to this vulnerability. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 6.5,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+      "references": [
+        "https://github.com/kzLiu2017/Tuya_Cam_CVE_Doc/blob/main/zsviot%20camera.pdf",
+        "https://vuldb.com/?ctiid.265077",
+        "https://vuldb.com/?id.265077",
+        "https://vuldb.com/?submit.332461",
+        "https://github.com/kzLiu2017/Tuya_Cam_CVE_Doc/blob/main/zsviot%20camera.pdf",
+        "https://vuldb.com/?ctiid.265077",
+        "https://vuldb.com/?id.265077",
+        "https://vuldb.com/?submit.332461"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-13892",
+      "published": "2025-03-06T14:15:35.453",
+      "lastModified": "2025-10-03T09:15:32.980",
+      "description": "Smartwares cameras CIP-37210AT and C724IP, as well as others which share the same firmware in versions up to 3.3.0, are vulnerable to command injection. \nDuring the initialization process, a user has to use a mobile app to provide devices with Access Point credentials. This input is not properly sanitized, what allows for command injection.\nThe vendor has not replied to reports, so the patching status remains unknown. Newer firmware versions might be vulnerable as well.",
+      "cvssScore": null,
+      "cvssSeverity": null,
+      "cvssVector": null,
+      "references": [
+        "https://cert.pl/en/posts/2025/03/CVE-2024-13892/",
+        "https://www.smartwares.eu/en-gb/smartwares-cip-37210at-indoor-wi-fi-camera-cip--37210at"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-13893",
+      "published": "2025-03-06T14:15:35.630",
+      "lastModified": "2025-03-06T14:15:35.630",
+      "description": "Smartwares cameras CIP-37210AT and C724IP, as well as others which share the same firmware in versions up to 3.3.0, might share same credentials for telnet service. Hash of the password can be retrieved through physical access to SPI connected memory.\nFor the telnet service to be enabled, the inserted SD card needs to have a folder with a specific name created. \nTwo products were tested, but since the vendor has not replied to reports, patching status remains unknown, as well as groups of devices and firmware ranges in which the same password is shared.\n Newer firmware versions might be vulnerable as well.",
+      "cvssScore": null,
+      "cvssSeverity": null,
+      "cvssVector": null,
+      "references": [
+        "https://cert.pl/en/posts/2025/03/CVE-2024-13892/",
+        "https://www.smartwares.eu/en-gb/smartwares-cip-37210at-indoor-wi-fi-camera-cip--37210at"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2024-13894",
+      "published": "2025-03-06T14:15:35.777",
+      "lastModified": "2025-03-06T14:15:35.777",
+      "description": "Smartwares cameras CIP-37210AT and C724IP, as well as others which share the same firmware in versions up to 3.3.0, are vulnerable to path traversal. \nWhen an affected device is connected to a mobile app, it opens a port 10000 enabling a user to download pictures shot at specific moments by providing paths to the files. However, the directories to which a user has access are not limited, allowing for path traversal attacks and downloading sensitive information.\nThe vendor has not replied to reports, so the patching status remains unknown. Newer firmware versions might be vulnerable as well.",
+      "cvssScore": null,
+      "cvssSeverity": null,
+      "cvssVector": null,
+      "references": [
+        "https://cert.pl/en/posts/2025/03/CVE-2024-13892/",
+        "https://www.smartwares.eu/en-gb/smartwares-cip-37210at-indoor-wi-fi-camera-cip--37210at"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2025-9380",
+      "published": "2025-08-24T07:15:30.563",
+      "lastModified": "2025-08-25T20:24:45.327",
+      "description": "A vulnerability was identified in FNKvision Y215 CCTV Camera 10.194.120.40. Affected by this issue is some unknown functionality of the file /etc/passwd of the component Firmware. Such manipulation leads to hard-coded credentials. Local access is required to approach this attack. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 7.8,
+      "cvssSeverity": "HIGH",
+      "cvssVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+      "references": [
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215",
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215/#vulnerability-1-hardcoded-root-credentials-in-multiple-binaries",
+        "https://vuldb.com/?ctiid.321213",
+        "https://vuldb.com/?id.321213",
+        "https://vuldb.com/?submit.629810"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2025-9381",
+      "published": "2025-08-24T08:15:27.250",
+      "lastModified": "2025-08-25T20:24:45.327",
+      "description": "A security flaw has been discovered in FNKvision Y215 CCTV Camera 10.194.120.40. This affects an unknown part of the file /tmp/wpa_supplicant.conf. Performing manipulation results in information disclosure. The attack may be carried out on the physical device. The attack's complexity is rated as high. It is indicated that the exploitability is difficult. The exploit has been released to the public and may be exploited. The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 1.6,
+      "cvssSeverity": "LOW",
+      "cvssVector": "CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:U/C:L/I:N/A:N",
+      "references": [
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215",
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215/#vulnerability-2-ssid-and-wi-fi-password-stored-in-plaintext",
+        "https://vuldb.com/?ctiid.321214",
+        "https://vuldb.com/?id.321214",
+        "https://vuldb.com/?submit.629811"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    },
+    {
+      "id": "CVE-2025-9382",
+      "published": "2025-08-24T08:15:28.277",
+      "lastModified": "2025-08-25T20:24:45.327",
+      "description": "A weakness has been identified in FNKvision Y215 CCTV Camera 10.194.120.40. This vulnerability affects unknown code of the file s1_rf_test_config of the component Telnet Sevice. Executing manipulation can lead to backdoor. The physical device can be targeted for the attack. This attack is characterized by high complexity. It is stated that the exploitability is difficult. The exploit has been made available to the public and could be exploited. The vendor was contacted early about this disclosure but did not respond in any way.",
+      "cvssScore": 6.4,
+      "cvssSeverity": "MEDIUM",
+      "cvssVector": "CVSS:3.1/AV:P/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "references": [
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215",
+        "https://vorachat.somsuay.com/blog/Hacking%20CCTV%20FNKvision%20-%20Y215/#vulnerability-3-sd-card-factory-backdoor",
+        "https://vuldb.com/?ctiid.321215",
+        "https://vuldb.com/?id.321215",
+        "https://vuldb.com/?submit.629812"
+      ],
+      "exploitAvailable": false,
+      "patchAvailable": false
+    }
   ]
 }

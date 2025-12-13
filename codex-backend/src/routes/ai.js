@@ -1,11 +1,12 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { getDatabase, saveDatabase } = require('../database/init');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, optionalAuth } = require('../middleware/auth');
 const { logAudit } = require('../middleware/audit');
 const logger = require('../utils/logger');
-const { scanPorts, getServiceName, grabBanner, checkPort } = require('../services/realNetworkScanner');
+const { scanPorts, getServiceName, grabBanner, checkPort, fullNetworkScan, arpScan, lookupVendor } = require('../services/realNetworkScanner');
 const { getDeviceCVEs } = require('../services/cveLookup');
+const { callAIEngine } = require('../services/aiAnalysis');
 
 const router = express.Router();
 
@@ -627,5 +628,200 @@ function performNetworkAnalysis(devices, vulnerabilities, alerts) {
 
   return analysis;
 }
+
+// IoT device type keywords for categorization
+const IOT_KEYWORDS = ['camera', 'doorbell', 'thermostat', 'speaker', 'hub', 'sensor', 'smart', 'alexa', 'echo', 'nest', 'ring', 'hue', 'philips', 'wyze', 'arlo', 'ecobee', 'sonos', 'roku', 'chromecast', 'fire tv', 'apple tv', 'smarttv', 'tv', 'printer', 'nvr', 'dvr'];
+const NORMAL_KEYWORDS = ['computer', 'laptop', 'desktop', 'phone', 'tablet', 'server', 'workstation', 'pc', 'mac', 'windows', 'linux'];
+
+function categorizeDevice(device) {
+  const name = (device.name || '').toLowerCase();
+  const type = (device.device_type || device.type || '').toLowerCase();
+  const vendor = (device.vendor || device.manufacturer || '').toLowerCase();
+  const combined = `${name} ${type} ${vendor}`;
+
+  if (IOT_KEYWORDS.some(k => combined.includes(k))) return 'iot';
+  if (NORMAL_KEYWORDS.some(k => combined.includes(k))) return 'normal';
+
+  // Default categorization based on device type
+  if (['router', 'gateway', 'switch', 'access_point', 'nas'].includes(type)) return 'normal';
+
+  return 'iot'; // Default to IoT for unknown devices
+}
+
+/**
+ * POST /ai/gemini-scan-report
+ * Full network scan with Gemini AI-powered security report
+ * Used by the AI Bot for comprehensive scanning
+ */
+router.post('/gemini-scan-report', optionalAuth, async (req, res) => {
+  try {
+    logger.info('[GEMINI] Starting full network scan with AI report generation...');
+
+    const db = getDatabase();
+    const startTime = Date.now();
+
+    // Step 1: Get all devices from database (or run quick discovery)
+    let devices = db.prepare('SELECT * FROM devices WHERE status != ?').all('offline');
+
+    // If no devices, try ARP scan first
+    if (devices.length === 0) {
+      logger.info('[GEMINI] No devices in DB, running ARP discovery...');
+      try {
+        const arpDevices = await arpScan();
+        for (const arpDev of arpDevices) {
+          const vendor = lookupVendor(arpDev.mac);
+          devices.push({
+            id: uuidv4(),
+            ip: arpDev.ip,
+            mac: arpDev.mac,
+            vendor: vendor,
+            name: `Device ${arpDev.ip}`,
+            device_type: 'unknown',
+            status: 'online'
+          });
+        }
+      } catch (arpErr) {
+        logger.warn('[GEMINI] ARP scan failed:', arpErr.message);
+      }
+    }
+
+    // Step 2: Categorize devices as IoT or Normal
+    const iotDevices = [];
+    const normalDevices = [];
+
+    for (const device of devices) {
+      const category = categorizeDevice(device);
+      if (category === 'iot') {
+        iotDevices.push(device);
+      } else {
+        normalDevices.push(device);
+      }
+    }
+
+    logger.info(`[GEMINI] Categorized: ${iotDevices.length} IoT, ${normalDevices.length} Normal devices`);
+
+    // Step 3: Get all vulnerabilities
+    const vulnerabilities = db.prepare("SELECT v.*, d.ip, d.name as device_name FROM vulnerabilities v LEFT JOIN devices d ON v.device_id = d.id WHERE v.status = 'open'").all();
+
+    // Step 4: Get open ports for vulnerable devices
+    const ports = db.prepare("SELECT p.*, d.ip FROM ports p LEFT JOIN devices d ON p.device_id = d.id WHERE p.status = 'open'").all();
+
+    // Step 5: Build prompt for Gemini
+    const iotList = iotDevices.map(d => `- ${d.name || d.ip} (${d.vendor || 'Unknown'}) [${d.ip}]`).join('\n');
+    const normalList = normalDevices.map(d => `- ${d.name || d.ip} (${d.vendor || 'Unknown'}) [${d.ip}]`).join('\n');
+    const vulnList = vulnerabilities.slice(0, 15).map(v => `- ${v.title || v.cve_id} (${v.severity}) on ${v.ip || 'Unknown'}`).join('\n');
+    const openPortsList = ports.slice(0, 20).map(p => `- Port ${p.port_number} (${p.service_name || 'unknown'}) on ${p.ip || 'Unknown'}`).join('\n');
+
+    const prompt = `You are a cybersecurity expert. Generate a comprehensive network security report based on the following scan results.
+
+**NETWORK SCAN RESULTS:**
+
+**IoT Devices Found (${iotDevices.length}):**
+${iotList || 'None detected'}
+
+**Normal Devices Found (${normalDevices.length}):**
+${normalList || 'None detected'}
+
+**Vulnerabilities Detected (${vulnerabilities.length}):**
+${vulnList || 'None detected'}
+
+**Open Ports (${ports.length}):**
+${openPortsList || 'None detected'}
+
+**REQUIRED OUTPUT FORMAT:**
+Please provide a structured security report with:
+
+# 🔐 Network Security Report
+
+## 📊 Summary
+[Overall assessment - 2-3 sentences about network health]
+
+## 🌐 IoT Devices (${iotDevices.length})
+[Brief analysis of IoT security posture]
+
+## 💻 Normal Devices (${normalDevices.length})
+[Brief analysis of regular devices]
+
+## ⚠️ Vulnerabilities Found
+[List top vulnerabilities with severity and which device they affect]
+
+## 🔧 Remediation Steps
+[Numbered list of specific actions to fix each issue, ordered by priority]
+
+## 📋 Recommendations
+[3-5 general security best practices for this network]
+
+Use markdown formatting with emojis for visual appeal.`;
+
+    // Step 6: Call Gemini AI
+    logger.info('[GEMINI] Calling Gemini AI for report generation...');
+    const aiReport = await callAIEngine(prompt);
+
+    const scanDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+    logger.info(`[GEMINI] Report generated in ${scanDuration}s`);
+
+    // Step 7: Save report to database
+    const reportId = uuidv4();
+    db.prepare(`
+      INSERT INTO ai_reports (id, device_id, ip, analysis_type, report_data, summary, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      reportId,
+      null,
+      'network-wide',
+      'gemini-full-scan',
+      aiReport,
+      `Network scan: ${devices.length} devices, ${vulnerabilities.length} vulnerabilities`,
+      new Date().toISOString()
+    );
+    saveDatabase();
+
+    // Step 8: Return structured response
+    res.json({
+      success: true,
+      reportId,
+      scanSummary: {
+        totalDevices: devices.length,
+        iotDevices: iotDevices.length,
+        normalDevices: normalDevices.length,
+        vulnerabilities: vulnerabilities.length,
+        openPorts: ports.length,
+        scanDuration: `${scanDuration}s`
+      },
+      devices: {
+        iot: iotDevices.map(d => ({
+          name: d.name,
+          ip: d.ip,
+          vendor: d.vendor || d.manufacturer,
+          type: d.device_type || 'IoT Device',
+          riskLevel: d.risk_level || 'unknown'
+        })),
+        normal: normalDevices.map(d => ({
+          name: d.name,
+          ip: d.ip,
+          vendor: d.vendor || d.manufacturer,
+          type: d.device_type || 'Device',
+          riskLevel: d.risk_level || 'unknown'
+        }))
+      },
+      vulnerabilities: vulnerabilities.slice(0, 10).map(v => ({
+        title: v.title,
+        severity: v.severity,
+        cve: v.cve_id,
+        device: v.device_name || v.ip
+      })),
+      aiReport,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('[GEMINI] Scan report error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate scan report',
+      details: error.message
+    });
+  }
+});
 
 module.exports = router;
