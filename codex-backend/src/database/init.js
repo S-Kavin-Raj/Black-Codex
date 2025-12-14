@@ -147,6 +147,10 @@ async function initializeDatabase() {
       services TEXT,
       notes TEXT,
       is_quarantined INTEGER DEFAULT 0,
+      device_category TEXT DEFAULT 'Unknown',
+      device_vendor TEXT,
+      device_role TEXT DEFAULT 'Unknown',
+      iot_device_type TEXT DEFAULT 'Unknown',
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     );

@@ -520,6 +520,19 @@ function detectDeviceType(vendor, openPorts) {
 
   // Single port detection
   if (openPorts.includes(554) || openPorts.includes(8554)) return 'camera';
+
+  // Mobile IP camera apps detection (IP Webcam, DroidCam, iVCam, etc.)
+  // These typically use port 8080 or 4747 with few other ports open
+  // Limit to devices with <= 4 ports to avoid misclassifying web servers/routers
+  if (openPorts.includes(8080) && openPorts.length <= 4) {
+    // Additional check: if it has typical mobile device ports (not router ports)
+    const hasRouterPorts = openPorts.some(p => [53, 67, 7547].includes(p));
+    if (!hasRouterPorts) return 'camera';
+  }
+
+  // DroidCam specific port
+  if (openPorts.includes(4747)) return 'camera';
+
   if (openPorts.includes(9100)) return 'printer';
   if (openPorts.includes(5000) || openPorts.includes(5001)) return 'nas';
   if (openPorts.includes(1883) || openPorts.includes(8883)) return 'iot_hub';
@@ -640,7 +653,7 @@ async function pingHost(ip, timeout = 2000) {
  * Check if device is alive using ping + TCP port probe fallback
  * Solves issue where devices block ICMP but are still online
  */
-async function isDeviceAlive(ip, timeout = 3000) {
+async function isDeviceAlive(ip, timeout = 5000) {
   // Try ping first (fastest method)
   if (await pingHost(ip, timeout)) {
     return true;
@@ -668,7 +681,7 @@ async function isDeviceAlive(ip, timeout = 3000) {
 /**
  * Scan a single port on an IP
  */
-function scanPort(ip, port, timeout = 500) {
+function scanPort(ip, port, timeout = 1000) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     let resolved = false;
@@ -913,6 +926,12 @@ async function getHostname(ip) {
 function calculateRiskScore(device) {
   let score = 0;
 
+  // CRITICAL: Weak or missing credentials (HIGHEST PRIORITY)
+  // Check if device has weak credentials flag set
+  if (device.hasWeakCredentials || device.has_weak_credentials) {
+    score += 50; // Critical risk - device has NO authentication or weak default passwords
+  }
+
   // Dangerous ports
   const dangerousPorts = [23, 21, 7547, 37777, 34567];
   const foundDangerous = device.openPorts.filter(p => dangerousPorts.includes(p));
@@ -1078,10 +1097,25 @@ async function fullNetworkScan(subnet, progressCallback) {
         services: openPorts.map(p => ({ port: p, service: getServiceName(p) })),
         status: 'online',
         discoveredAt: now,
-        lastSeen: now
+        lastSeen: now,
+        hasWeakCredentials: false // Initialize flag
       };
 
-      // Calculate risk
+      // Check for weak credentials if device has HTTP/admin ports
+      const httpPorts = openPorts.filter(p => [80, 443, 8080, 8443, 8000, 8888].includes(p));
+      if (httpPorts.length > 0) {
+        try {
+          const credCheck = await checkCredentials(arpDevice.ip, openPorts, deviceType);
+          if (credCheck.weakCredentialsFound || credCheck.defaultCredentialsFound) {
+            device.hasWeakCredentials = true;
+            logger.info(`[SECURITY] Device ${arpDevice.ip} has weak/no credentials!`);
+          }
+        } catch (err) {
+          logger.warn(`Credential check failed for ${arpDevice.ip}:`, err.message);
+        }
+      }
+
+      // Calculate risk (now includes weak credentials check)
       device.riskScore = calculateRiskScore(device);
       device.riskLevel = getRiskLevel(device.riskScore);
 
@@ -1107,6 +1141,7 @@ async function fullNetworkScan(subnet, progressCallback) {
             risk_score = ?,
             risk_level = ?,
             open_ports = ?,
+            has_weak_credentials = ?,
             last_seen = ?,
             updated_at = ?
           WHERE ip = ?
@@ -1118,6 +1153,7 @@ async function fullNetworkScan(subnet, progressCallback) {
           device.riskScore,
           device.riskLevel,
           JSON.stringify(device.openPorts),
+          device.hasWeakCredentials ? 1 : 0,
           now,
           now,
           device.ip
@@ -1126,8 +1162,8 @@ async function fullNetworkScan(subnet, progressCallback) {
       } else {
         // Insert new device
         db.prepare(`
-          INSERT INTO devices (id, name, ip, mac, device_type, manufacturer, status, risk_score, risk_level, open_ports, discovered_at, last_seen, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, 'online', ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO devices (id, name, ip, mac, device_type, manufacturer, status, risk_score, risk_level, open_ports, has_weak_credentials, discovered_at, last_seen, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, 'online', ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
           device.id,
           device.hostname || `Device ${device.ip}`,
@@ -1138,6 +1174,7 @@ async function fullNetworkScan(subnet, progressCallback) {
           device.riskScore,
           device.riskLevel,
           JSON.stringify(device.openPorts),
+          device.hasWeakCredentials ? 1 : 0,
           now,
           now,
           now,
@@ -1165,6 +1202,27 @@ async function fullNetworkScan(subnet, progressCallback) {
           VALUES (?, ?, ?, ?, 'open')
         `).run(uuidv4(), device.id, port, getServiceName(port));
       }
+
+      // Optional IoT Classification (Non-intrusive post-processing)
+      // Runs AFTER device save, does not affect scan results or risk scores
+      try {
+        const { classifyDevice } = require('./nmapVendorClassifier');
+        const deviceData = { openPorts: device.openPorts, ip: device.ip };
+        const classification = await classifyDevice(device.ip, device.vendor, device.deviceType, deviceData);
+
+        // Update device with classification (separate query, non-critical)
+        db.prepare(`
+          UPDATE devices 
+          SET device_category = ?, device_vendor = ?, device_role = ?, iot_device_type = ?
+          WHERE ip = ?
+        `).run(classification.category, classification.vendor || device.vendor, classification.device_role || 'Unknown', classification.iot_device_type || 'Unknown', device.ip);
+
+        logger.debug(`[IoT Classification] ${device.ip}: ${classification.category}, Role: ${classification.device_role}, Type: ${classification.iot_device_type || 'N/A'}`);
+      } catch (classErr) {
+        // Graceful fallback - classification failure doesn't affect scan
+        logger.warn(`IoT classification failed for ${device.ip}:`, classErr.message);
+      }
+
 
       // Check for vulnerabilities and collect them with IP info
       const deviceVulns = await checkDeviceVulnerabilities(device);
