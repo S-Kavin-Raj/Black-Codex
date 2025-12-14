@@ -30388,3 +30388,642 @@
 {"level":"info","message":"::1 - - [14/Dec/2025:03:19:36 +0000] \"GET /api/devices/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:19:36.007Z"}
 {"level":"info","message":"::1 - - [14/Dec/2025:03:19:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:19:36.011Z"}
 {"level":"info","message":"SIGINT received, shutting down gracefully","service":"black-codex","timestamp":"2025-12-14T03:19:53.349Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:22:31.475Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:22:31.516Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:22:31.516Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:22:31.517Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:22:31.517Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:22:31.520Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:22:31.736Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:22:31.736Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:22:31.739Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:22:31.739Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:22:31.740Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:22:31.740Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:22:31.740Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:22:31.742Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:22:31.743Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:22:31.745Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:22:31.746Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:22:31.747Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:22:31.747Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:22:31.748Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:22:31.749Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:22:31.749Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:22:31.750Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:22:31.750Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.751Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.751Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.751Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.752Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.752Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:22:31.753Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.754Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:22:31.755Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.755Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:22:31.756Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.757Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.757Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.758Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:22:31.758Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.758Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.759Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.759Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.760Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:22:31.760Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:22:31.761Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:22:31.762Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:22:31.762Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:22:31.763Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:22:31.763Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:22:31.764Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:22:31.764Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/alerts HTTP/1.1\" 200 12929 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.716Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/devices HTTP/1.1\" 200 30272 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.723Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/quarantine HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.727Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.730Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.736Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.741Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.747Z"}
+{"level":"info","message":"WebSocket client connected: d03f5ef7-7a85-4174-bb70-32a7fd7c7ff2","service":"black-codex","timestamp":"2025-12-14T03:22:36.752Z"}
+{"level":"info","message":"WebSocket client d03f5ef7-7a85-4174-bb70-32a7fd7c7ff2 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:22:36.753Z"}
+{"level":"info","message":"Client d03f5ef7-7a85-4174-bb70-32a7fd7c7ff2 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:22:36.756Z"}
+{"level":"info","message":"Client d03f5ef7-7a85-4174-bb70-32a7fd7c7ff2 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:22:36.757Z"}
+{"level":"info","message":"Client d03f5ef7-7a85-4174-bb70-32a7fd7c7ff2 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:22:36.757Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/network/bandwidth HTTP/1.1\" 200 98 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.761Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/devices/stats/summary HTTP/1.1\" 200 339 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.768Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:36.774Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:41 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:41.328Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:41 +0000] \"GET /api/devices HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:41.333Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:22:41.757Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:22:41.758Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:22:42.604Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:22:42.606Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:22:42.894Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:22:42.899Z"}
+{"level":"info","message":"[ThreatFeed] Added 0 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:22:42.901Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:51 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:51.334Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:51 +0000] \"GET /api/scan/status HTTP/1.1\" 200 333 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:51.562Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:51 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:51.573Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:56 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:56.673Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:22:56 +0000] \"GET /api/devices HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:22:56.679Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:23:00.003Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:23:00.101Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:06 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:06.965Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:16 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:16.968Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:26 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:26.954Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:30 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:30.656Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:30 +0000] \"GET /api/scan/status HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:30.659Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:36.693Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:36.695Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:36.698Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:40 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:40.659Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:23:50 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:23:50.656Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:24:00.579Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:24:00.626Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:00 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:00.967Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:10 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:10.962Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:20 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:20.968Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:30 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:30.963Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:36.958Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:36.961Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:36.963Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:40 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:40.958Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:24:50 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:24:50.969Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:25:00.146Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:25:00.191Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:25:04.657Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:25:04.705Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:25:04.706Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:25:04.706Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:25:04.707Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:25:04.711Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:25:04.939Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:25:04.939Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:25:04.942Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:25:04.942Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:25:04.943Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:25:04.943Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:25:04.943Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:25:04.945Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:25:04.946Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:25:04.948Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:25:04.949Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:25:04.949Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:25:04.950Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:25:04.951Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:25:04.952Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:25:04.952Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:25:04.953Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:25:04.954Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.955Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.955Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.956Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.957Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.958Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:25:04.959Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.961Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:25:04.962Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.963Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:25:04.964Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.964Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.965Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.966Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:25:04.967Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.968Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.968Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.969Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.970Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:25:04.971Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:25:04.972Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:25:04.973Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:25:04.974Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:25:04.975Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:25:04.975Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:25:04.977Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:25:04.977Z"}
+{"level":"info","message":"WebSocket client connected: f21f964f-f1c7-440b-8161-41b4ba8db80b","service":"black-codex","timestamp":"2025-12-14T03:25:04.992Z"}
+{"level":"info","message":"WebSocket client f21f964f-f1c7-440b-8161-41b4ba8db80b authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:25:04.993Z"}
+{"level":"info","message":"Client f21f964f-f1c7-440b-8161-41b4ba8db80b subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:25:04.994Z"}
+{"level":"info","message":"Client f21f964f-f1c7-440b-8161-41b4ba8db80b subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:25:04.995Z"}
+{"level":"info","message":"Client f21f964f-f1c7-440b-8161-41b4ba8db80b subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:25:04.995Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:25:14.951Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:25:14.952Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:25:15.657Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:25:15.657Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:25:15.938Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:25:15.942Z"}
+{"level":"info","message":"[ThreatFeed] Added 0 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:25:15.944Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:34 +0000] \"GET /api/alerts HTTP/1.1\" 200 12929 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:34.966Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:36.968Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:36.970Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:36.973Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:39 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:39.581Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:39 +0000] \"GET /api/network/topology HTTP/1.1\" 200 15859 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:39.589Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:40 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:40.081Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:40 +0000] \"GET /api/devices HTTP/1.1\" 200 30272 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:40.089Z"}
+{"level":"info","message":"WebSocket client disconnected: f21f964f-f1c7-440b-8161-41b4ba8db80b","service":"black-codex","timestamp":"2025-12-14T03:25:41.149Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:41 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:41.271Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:41 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:41.276Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:41 +0000] \"GET /api/devices HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:41.283Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:41 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:41.288Z"}
+{"level":"info","message":"WebSocket client connected: ed0accd1-c25b-471f-8f73-38d5b8c41031","service":"black-codex","timestamp":"2025-12-14T03:25:41.293Z"}
+{"level":"info","message":"WebSocket client ed0accd1-c25b-471f-8f73-38d5b8c41031 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:25:41.294Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:25:41 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:25:41.301Z"}
+{"level":"info","message":"Client ed0accd1-c25b-471f-8f73-38d5b8c41031 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:25:41.314Z"}
+{"level":"info","message":"Client ed0accd1-c25b-471f-8f73-38d5b8c41031 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:25:41.315Z"}
+{"level":"info","message":"Client ed0accd1-c25b-471f-8f73-38d5b8c41031 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:25:41.317Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"black-codex","timestamp":"2025-12-14T03:25:50.476Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:26:32.332Z"}
+{"level":"info","message":"Default admin user created","service":"black-codex","timestamp":"2025-12-14T03:26:32.445Z"}
+{"level":"info","message":"Default credentials database seeded","service":"black-codex","timestamp":"2025-12-14T03:26:32.448Z"}
+{"level":"info","message":"Default settings seeded","service":"black-codex","timestamp":"2025-12-14T03:26:32.450Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:26:32.451Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:26:32.451Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:26:32.452Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:26:32.452Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:26:32.453Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:26:32.646Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:26:32.647Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:26:32.649Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:26:32.649Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:26:32.650Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:26:32.650Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:26:32.650Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:26:32.654Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:26:32.654Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:26:32.655Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:26:32.656Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:26:32.656Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:26:32.657Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:26:32.658Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:26:32.658Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:26:32.659Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:26:32.659Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:26:32.660Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.660Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.661Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.661Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.662Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.662Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:26:32.663Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.663Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:26:32.664Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.664Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:26:32.665Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.666Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.666Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.666Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:26:32.667Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.668Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.668Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.669Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.669Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:26:32.669Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:26:32.670Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:26:32.670Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:26:32.671Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:26:32.671Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:26:32.672Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:26:32.673Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:26:32.673Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:32 +0000] \"GET /api/alerts HTTP/1.1\" 200 12929 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:32.753Z"}
+{"level":"info","message":"WebSocket client connected: 2cefd662-286a-452c-b197-c0831b11f4b9","service":"black-codex","timestamp":"2025-12-14T03:26:34.967Z"}
+{"level":"info","message":"WebSocket client 2cefd662-286a-452c-b197-c0831b11f4b9 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:26:34.968Z"}
+{"level":"info","message":"Client 2cefd662-286a-452c-b197-c0831b11f4b9 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:26:34.969Z"}
+{"level":"info","message":"Client 2cefd662-286a-452c-b197-c0831b11f4b9 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:26:34.969Z"}
+{"level":"info","message":"Client 2cefd662-286a-452c-b197-c0831b11f4b9 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:26:34.970Z"}
+{"level":"info","message":"WebSocket client disconnected: 2cefd662-286a-452c-b197-c0831b11f4b9","service":"black-codex","timestamp":"2025-12-14T03:26:35.193Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:36.699Z"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [14/Dec/2025:03:26:36 +0000] \"GET /api/devices HTTP/1.1\" 200 30272 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:36.706Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:36.709Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:36.712Z"}
+{"level":"info","message":"WebSocket client connected: aef67909-7f97-4b2a-b8fc-06e27bef8537","service":"black-codex","timestamp":"2025-12-14T03:26:36.714Z"}
+{"level":"info","message":"WebSocket client aef67909-7f97-4b2a-b8fc-06e27bef8537 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:26:36.714Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 200 85 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:36.718Z"}
+{"level":"info","message":"Client aef67909-7f97-4b2a-b8fc-06e27bef8537 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:26:36.729Z"}
+{"level":"info","message":"Client aef67909-7f97-4b2a-b8fc-06e27bef8537 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:26:36.729Z"}
+{"level":"info","message":"Client aef67909-7f97-4b2a-b8fc-06e27bef8537 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:26:36.730Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:26:42.665Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:26:42.668Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:26:43.506Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:26:43.508Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:26:43.925Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:26:43.939Z"}
+{"level":"info","message":"[ThreatFeed] Added 20 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:26:43.940Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:46 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:46.698Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:54 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:54.711Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:54 +0000] \"GET /api/network/topology HTTP/1.1\" 200 15859 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:54.718Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:55 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:55.687Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:55 +0000] \"GET /api/alerts/settings/email HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:55.691Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:56 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:56.683Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:26:56 +0000] \"GET /api/scan/status HTTP/1.1\" 200 67 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:26:56.687Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:27:00.912Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:27:00.984Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:06 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:06.504Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:06 +0000] \"GET /api/alerts/settings/email HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:06.507Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:07 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:07.787Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:07 +0000] \"GET /api/devices HTTP/1.1\" 200 30272 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:07.796Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:17 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:17.791Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:27 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:27.967Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:36.955Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:36.957Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 200 8438 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:36.959Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:37 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:37.953Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:47 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:47.961Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:27:57 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:27:57.966Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:28:00.581Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:28:00.628Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:07 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:07.962Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:17 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:17.962Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:34 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:34.958Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:36.962Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:36.964Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:28:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:28:36.968Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:29:00.147Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:29:00.193Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:29:14.474Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:29:14.519Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:29:14.520Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:29:14.520Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:29:14.520Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:29:14.524Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:29:14.732Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:29:14.732Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:29:14.735Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:29:14.735Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:29:14.736Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:29:14.736Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:29:14.736Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:29:14.738Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:29:14.739Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:14.741Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:14.742Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:29:14.743Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:29:14.743Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:29:14.744Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:14.745Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:14.745Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:29:14.746Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:14.746Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.746Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.747Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.747Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.748Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.748Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:14.749Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.750Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:14.750Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.751Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:14.751Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.752Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.752Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.753Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:14.753Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.753Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.754Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.754Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.755Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:14.755Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:14.756Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:14.756Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:14.757Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:14.757Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:29:14.758Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:29:14.759Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:29:14.759Z"}
+{"level":"info","message":"WebSocket client connected: e3acaca1-7235-4df6-ae29-930343591aea","service":"black-codex","timestamp":"2025-12-14T03:29:14.970Z"}
+{"level":"info","message":"WebSocket client e3acaca1-7235-4df6-ae29-930343591aea authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:29:14.971Z"}
+{"level":"info","message":"Client e3acaca1-7235-4df6-ae29-930343591aea subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:29:14.972Z"}
+{"level":"info","message":"Client e3acaca1-7235-4df6-ae29-930343591aea subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:29:14.972Z"}
+{"level":"info","message":"Client e3acaca1-7235-4df6-ae29-930343591aea subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:29:14.972Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:29:24.742Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:29:24.742Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:29:25.530Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:29:25.530Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:29:25.854Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:29:25.858Z"}
+{"level":"info","message":"[ThreatFeed] Added 0 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:29:25.863Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:29:32.104Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:29:32.144Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:29:32.144Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:29:32.145Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:29:32.145Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:29:32.148Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:29:32.349Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:29:32.349Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:29:32.352Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:29:32.352Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:29:32.353Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:29:32.353Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:29:32.353Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:29:32.355Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:29:32.356Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:32.358Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:32.359Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:29:32.360Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:29:32.360Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:29:32.361Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:32.362Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:32.362Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:29:32.363Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:32.363Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.363Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.364Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.364Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.365Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.365Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:32.366Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.367Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:29:32.368Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.368Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:32.369Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.369Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.370Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.370Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:29:32.371Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.372Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.372Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.373Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.373Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:29:32.374Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:32.374Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:32.375Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:32.376Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:29:32.376Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:29:32.377Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:29:32.378Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:29:32.378Z"}
+{"level":"info","message":"WebSocket client connected: ec2cf7ff-c11b-44ac-bc51-759a38bd8fb5","service":"black-codex","timestamp":"2025-12-14T03:29:32.967Z"}
+{"level":"info","message":"WebSocket client ec2cf7ff-c11b-44ac-bc51-759a38bd8fb5 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:29:32.967Z"}
+{"level":"info","message":"Client ec2cf7ff-c11b-44ac-bc51-759a38bd8fb5 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:29:32.968Z"}
+{"level":"info","message":"Client ec2cf7ff-c11b-44ac-bc51-759a38bd8fb5 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:29:32.968Z"}
+{"level":"info","message":"Client ec2cf7ff-c11b-44ac-bc51-759a38bd8fb5 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:29:32.969Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:29:34 +0000] \"GET /api/alerts HTTP/1.1\" 200 12929 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:29:34.977Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:29:36 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:29:36.965Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:29:36 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:29:36.967Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:29:36 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:29:36.970Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:29:42.361Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:29:42.361Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:29:42.989Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:29:42.989Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:29:43.157Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:29:43.159Z"}
+{"level":"info","message":"[ThreatFeed] Added 0 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:29:43.160Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:30:00.650Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:30:00.697Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"black-codex","timestamp":"2025-12-14T03:30:26.883Z"}
+{"level":"warn","message":"[Email] nodemailer not installed - emails will be logged only","service":"black-codex","timestamp":"2025-12-14T03:31:11.436Z"}
+{"level":"info","message":"Database initialization complete","service":"black-codex","timestamp":"2025-12-14T03:31:11.477Z"}
+{"level":"info","message":"Database initialized","service":"black-codex","timestamp":"2025-12-14T03:31:11.477Z"}
+{"level":"info","message":"Starting initial network scan...","service":"black-codex","timestamp":"2025-12-14T03:31:11.478Z"}
+{"level":"info","message":"[InitialScan] Starting real network discovery...","service":"black-codex","timestamp":"2025-12-14T03:31:11.478Z"}
+{"level":"info","message":"[InitialScan] Cleared old data","service":"black-codex","timestamp":"2025-12-14T03:31:11.481Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:31:11.674Z"}
+{"level":"info","message":"WebSocket server initialized","service":"black-codex","timestamp":"2025-12-14T03:31:11.674Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:31:11.677Z"}
+{"level":"info","message":"Scheduled tasks started","service":"black-codex","timestamp":"2025-12-14T03:31:11.678Z"}
+{"level":"info","message":"Black Codex Backend (HTTP) running on port 3001","service":"black-codex","timestamp":"2025-12-14T03:31:11.678Z"}
+{"level":"info","message":"Environment: development","service":"black-codex","timestamp":"2025-12-14T03:31:11.679Z"}
+{"level":"warn","message":"SSL cert/key not provided — running without TLS","service":"black-codex","timestamp":"2025-12-14T03:31:11.679Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:31:11.681Z"}
+{"level":"info","message":"[InitialScan] Discovered 33 devices via ARP","service":"black-codex","timestamp":"2025-12-14T03:31:11.681Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.1 (Shenzhen Zeroone Technology)","service":"black-codex","timestamp":"2025-12-14T03:31:11.684Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.12 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:31:11.685Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.13 (NComputing)","service":"black-codex","timestamp":"2025-12-14T03:31:11.685Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.14 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:31:11.686Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.15 (Cisco-Meraki)","service":"black-codex","timestamp":"2025-12-14T03:31:11.686Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.16 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:31:11.687Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.17 (HP)","service":"black-codex","timestamp":"2025-12-14T03:31:11.687Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.18 (ChangYang Tech)","service":"black-codex","timestamp":"2025-12-14T03:31:11.688Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.19 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:31:11.688Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.20 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.688Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.21 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.689Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.22 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.689Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.23 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.689Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.24 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.690Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.25 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:31:11.691Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.26 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.691Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.27 (Cisco)","service":"black-codex","timestamp":"2025-12-14T03:31:11.692Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.28 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.692Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.29 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:31:11.693Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.30 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.693Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.31 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.694Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.32 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.694Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.33 (Liteon Technology)","service":"black-codex","timestamp":"2025-12-14T03:31:11.695Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.34 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.695Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.35 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.696Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.36 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.696Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.37 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.696Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.8.47 (Unknown Vendor)","service":"black-codex","timestamp":"2025-12-14T03:31:11.697Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.127 (HP)","service":"black-codex","timestamp":"2025-12-14T03:31:11.697Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.133 (HP)","service":"black-codex","timestamp":"2025-12-14T03:31:11.698Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.138 (HP)","service":"black-codex","timestamp":"2025-12-14T03:31:11.698Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.9.147 (HP)","service":"black-codex","timestamp":"2025-12-14T03:31:11.699Z"}
+{"level":"info","message":"[InitialScan] Added device: 192.168.50.18 (Huawei)","service":"black-codex","timestamp":"2025-12-14T03:31:11.699Z"}
+{"level":"info","message":"[InitialScan] Complete: 33 real devices added to database","service":"black-codex","timestamp":"2025-12-14T03:31:11.700Z"}
+{"level":"info","message":"Initial scan complete: Found 33 real devices","service":"black-codex","timestamp":"2025-12-14T03:31:11.701Z"}
+{"level":"info","message":"WebSocket client connected: 78a1315d-fe1e-456f-959b-5cd81c1034fd","service":"black-codex","timestamp":"2025-12-14T03:31:11.796Z"}
+{"level":"info","message":"WebSocket client 78a1315d-fe1e-456f-959b-5cd81c1034fd authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:31:11.796Z"}
+{"level":"info","message":"Client 78a1315d-fe1e-456f-959b-5cd81c1034fd subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:31:11.797Z"}
+{"level":"info","message":"Client 78a1315d-fe1e-456f-959b-5cd81c1034fd subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:31:11.798Z"}
+{"level":"info","message":"Client 78a1315d-fe1e-456f-959b-5cd81c1034fd subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:31:11.798Z"}
+{"level":"info","message":"WebSocket client disconnected: 78a1315d-fe1e-456f-959b-5cd81c1034fd","service":"black-codex","timestamp":"2025-12-14T03:31:15.746Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:15 +0000] \"GET /api/alerts HTTP/1.1\" 200 12929 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:15.831Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:15 +0000] \"GET /api/devices HTTP/1.1\" 200 30272 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:15.841Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:15 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:15.849Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:15 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:15.857Z"}
+{"level":"info","message":"WebSocket client connected: d4739935-5b7b-45da-8ca7-392b4ff23fc0","service":"black-codex","timestamp":"2025-12-14T03:31:15.862Z"}
+{"level":"info","message":"WebSocket client d4739935-5b7b-45da-8ca7-392b4ff23fc0 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:31:15.864Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:15 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:15.870Z"}
+{"level":"info","message":"Client d4739935-5b7b-45da-8ca7-392b4ff23fc0 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:31:15.882Z"}
+{"level":"info","message":"Client d4739935-5b7b-45da-8ca7-392b4ff23fc0 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:31:15.885Z"}
+{"level":"info","message":"Client d4739935-5b7b-45da-8ca7-392b4ff23fc0 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:31:15.885Z"}
+{"level":"info","message":"Performing startup threat feed update...","service":"black-codex","timestamp":"2025-12-14T03:31:21.688Z"}
+{"level":"info","message":"[ThreatFeed] Fetching recent threats from URLhaus...","service":"black-codex","timestamp":"2025-12-14T03:31:21.689Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:22 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:22.536Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:22 +0000] \"GET /api/alerts/settings/email HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:22.542Z"}
+{"level":"error","message":"[ThreatFeed] Failed to fetch threats: API Error: 401","service":"black-codex","timestamp":"2025-12-14T03:31:22.603Z"}
+{"level":"info","message":"[ThreatFeed] Fetching CISA Known Exploited Vulnerabilities...","service":"black-codex","timestamp":"2025-12-14T03:31:22.604Z"}
+{"level":"info","message":"[ThreatFeed] Retrieved 1475 CISA records","service":"black-codex","timestamp":"2025-12-14T03:31:22.883Z"}
+{"level":"info","message":"Database saved to disk","service":"black-codex","timestamp":"2025-12-14T03:31:22.889Z"}
+{"level":"info","message":"[ThreatFeed] Added 0 CISA exploits","service":"black-codex","timestamp":"2025-12-14T03:31:22.890Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:23.278Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:23 +0000] \"GET /api/scan/status HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:23.280Z"}
+{"level":"info","message":"Starting full network scan on auto-detected network","service":"black-codex","timestamp":"2025-12-14T03:31:24.402Z"}
+{"level":"info","message":"Auto-detected subnet: 192.168.8.0/22","service":"black-codex","timestamp":"2025-12-14T03:31:24.413Z"}
+{"level":"info","message":"Marked all existing devices as offline for fresh scan","service":"black-codex","timestamp":"2025-12-14T03:31:24.418Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:24 +0000] \"POST /api/scan/start HTTP/1.1\" 200 121 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:24.429Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:31:24.497Z"}
+{"level":"info","message":"Ping sweeping 226 IPs not in ARP cache...","service":"black-codex","timestamp":"2025-12-14T03:31:24.499Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:33 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:33.282Z"}
+{"level":"info","message":"Found 49 potential devices","service":"black-codex","timestamp":"2025-12-14T03:31:33.990Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.1: Command failed: nmap -sn 192.168.8.1\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:35.131Z"}
+{"level":"debug","message":"Vendor \"Shenzhen Zeroone Technology\" matched IoT pattern","service":"black-codex","timestamp":"2025-12-14T03:31:35.132Z"}
+{"level":"info","message":"[Classification] 192.168.8.1: IoT, Role: Main, IoT Type: CCTV Camera","service":"black-codex","timestamp":"2025-12-14T03:31:35.132Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.1: IoT, Role: Main, Type: CCTV Camera","service":"black-codex","timestamp":"2025-12-14T03:31:35.133Z"}
+{"level":"info","message":"[CVE] Cache hit for shenzhen zeroone technology::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:35.134Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.1","service":"black-codex","timestamp":"2025-12-14T03:31:35.135Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.12: Command failed: nmap -sn 192.168.8.12\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:36.336Z"}
+{"level":"debug","message":"Vendor \"Cisco\" did not match any patterns","service":"black-codex","timestamp":"2025-12-14T03:31:36.338Z"}
+{"level":"info","message":"[Classification] 192.168.8.12: Unknown, Role: Secondary, IoT Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:36.339Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.12: Unknown, Role: Secondary, Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:36.340Z"}
+{"level":"info","message":"[CVE] Cache hit for cisco::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:36.341Z"}
+{"level":"info","message":"[NVD] Found 20 CVEs for Cisco unknown","service":"black-codex","timestamp":"2025-12-14T03:31:36.341Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: Unencrypted Web Interface on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.352Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2003-0216 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.352Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2004-0308 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.353Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-1517 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.355Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-2681 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.356Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-4258 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.356Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2006-4313 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.356Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-1542 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.357Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-2462 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.357Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-2463 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.358Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-4011 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.359Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-4263 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.360Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-0537 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.362Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-1159 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.362Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2054 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.362Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2059 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.363Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2732 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.363Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2736 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.364Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-3815 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.364Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2009-0061 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.365Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2009-0062 on 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.365Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.12","service":"black-codex","timestamp":"2025-12-14T03:31:36.366Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.13: Command failed: nmap -sn 192.168.8.13\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:37.500Z"}
+{"level":"debug","message":"Vendor \"NComputing\" matched IoT pattern","service":"black-codex","timestamp":"2025-12-14T03:31:37.501Z"}
+{"level":"info","message":"[Classification] 192.168.8.13: IoT, Role: Secondary, IoT Type: Thin Client Terminal","service":"black-codex","timestamp":"2025-12-14T03:31:37.501Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.13: IoT, Role: Secondary, Type: Thin Client Terminal","service":"black-codex","timestamp":"2025-12-14T03:31:37.502Z"}
+{"level":"info","message":"[CVE] Cache hit for ncomputing::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:37.502Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.13","service":"black-codex","timestamp":"2025-12-14T03:31:37.503Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.14: Command failed: nmap -sn 192.168.8.14\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:39.023Z"}
+{"level":"debug","message":"Vendor \"ChangYang Tech\" matched IoT pattern","service":"black-codex","timestamp":"2025-12-14T03:31:39.023Z"}
+{"level":"info","message":"[Classification] 192.168.8.14: IoT, Role: Secondary, IoT Type: CCTV Camera","service":"black-codex","timestamp":"2025-12-14T03:31:39.024Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.14: IoT, Role: Secondary, Type: CCTV Camera","service":"black-codex","timestamp":"2025-12-14T03:31:39.025Z"}
+{"level":"info","message":"[CVE] Cache hit for changyang tech::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:39.026Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.14","service":"black-codex","timestamp":"2025-12-14T03:31:39.027Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.15: Command failed: nmap -sn 192.168.8.15\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:40.452Z"}
+{"level":"debug","message":"Vendor \"Cisco-Meraki\" did not match any patterns","service":"black-codex","timestamp":"2025-12-14T03:31:40.454Z"}
+{"level":"info","message":"[Classification] 192.168.8.15: Unknown, Role: Secondary, IoT Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:40.454Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.15: Unknown, Role: Secondary, Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:40.455Z"}
+{"level":"info","message":"[CVE] Cache hit for cisco-meraki::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:40.457Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.15","service":"black-codex","timestamp":"2025-12-14T03:31:40.458Z"}
+{"level":"debug","message":"[Nmap] Lookup failed for 192.168.8.16: Command failed: nmap -sn 192.168.8.16\n'nmap' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","service":"black-codex","timestamp":"2025-12-14T03:31:41.698Z"}
+{"level":"debug","message":"Vendor \"Cisco\" did not match any patterns","service":"black-codex","timestamp":"2025-12-14T03:31:41.700Z"}
+{"level":"info","message":"[Classification] 192.168.8.16: Unknown, Role: Secondary, IoT Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:41.701Z"}
+{"level":"debug","message":"[IoT Classification] 192.168.8.16: Unknown, Role: Secondary, Type: N/A","service":"black-codex","timestamp":"2025-12-14T03:31:41.703Z"}
+{"level":"info","message":"[CVE] Cache hit for cisco::unknown","service":"black-codex","timestamp":"2025-12-14T03:31:41.705Z"}
+{"level":"info","message":"[NVD] Found 20 CVEs for Cisco unknown","service":"black-codex","timestamp":"2025-12-14T03:31:41.707Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: Unencrypted Web Interface on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.719Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2003-0216 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.720Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2004-0308 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.722Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-1517 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.724Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-2681 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.725Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2005-4258 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.726Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2006-4313 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.728Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-1542 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.731Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-2462 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.732Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-2463 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.733Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-4011 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.733Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2007-4263 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.734Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-0537 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.736Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-1159 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.737Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2054 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.738Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2059 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.739Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2732 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.740Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-2736 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.741Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2008-3815 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.742Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2009-0061 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.746Z"}
+{"level":"info","message":"[REAL-TIME] Broadcasted vulnerability: CVE-2009-0062 on 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.747Z"}
+{"level":"info","message":"Broadcasted device update for 192.168.8.16","service":"black-codex","timestamp":"2025-12-14T03:31:41.747Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:43 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:43.283Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:31:53 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:31:53.279Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:32:00.451Z"}
+{"level":"info","message":"ARP scan found 49 devices","service":"black-codex","timestamp":"2025-12-14T03:32:00.520Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:03 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:03.279Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:13 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:13.280Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:15 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:15.809Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:15 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:15.813Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:15 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:15.821Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:23.280Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:33 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:33.286Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:43 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:43.278Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:32:53 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:32:53.278Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:33:00.034Z"}
+{"level":"info","message":"ARP scan found 17 devices","service":"black-codex","timestamp":"2025-12-14T03:33:00.092Z"}
+{"level":"error","message":"Incremental sweep error: emit.deviceDiscovered is not a function","service":"black-codex","stack":"TypeError: emit.deviceDiscovered is not a function\n    at Task._execution (C:\\Users\\S KAVIN RAJ\\OneDrive\\Desktop\\Black-Codex\\codex-backend\\src\\services\\scheduler.js:39:16)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-12-14T03:33:00.102Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:03 +0000] \"GET /api/alerts HTTP/1.1\" 200 26154 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:03.969Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:13 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:13.956Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:15 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:15.964Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:15 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:15.965Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:15 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:15.966Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:23.954Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:33 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:33.962Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:43 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:43.076Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:43 +0000] \"GET /api/devices HTTP/1.1\" 200 31354 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:43.082Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:33:53 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:33:53.077Z"}
+{"level":"info","message":"[RefreshDevices] Starting network refresh...","service":"black-codex","timestamp":"2025-12-14T03:34:00.575Z"}
+{"level":"info","message":"ARP scan found 17 devices","service":"black-codex","timestamp":"2025-12-14T03:34:00.656Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:03 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:03.077Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:13 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:13.083Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:15 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:15.811Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:15 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:15.815Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:15 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:15.818Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.082Z"}
+{"level":"info","message":"WebSocket client disconnected: d4739935-5b7b-45da-8ca7-392b4ff23fc0","service":"black-codex","timestamp":"2025-12-14T03:34:23.289Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.402Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.409Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/scan/security/score HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.411Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/devices HTTP/1.1\" 200 31354 \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.416Z"}
+{"level":"info","message":"WebSocket client connected: 73a2c788-dd13-4076-91f5-d0c1f77038f4","service":"black-codex","timestamp":"2025-12-14T03:34:23.422Z"}
+{"level":"info","message":"WebSocket client 73a2c788-dd13-4076-91f5-d0c1f77038f4 authenticated in dev mode","service":"black-codex","timestamp":"2025-12-14T03:34:23.426Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:23 +0000] \"GET /api/threats/stats/summary HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:23.430Z"}
+{"level":"info","message":"Client 73a2c788-dd13-4076-91f5-d0c1f77038f4 subscribed to devices","service":"black-codex","timestamp":"2025-12-14T03:34:23.443Z"}
+{"level":"info","message":"Client 73a2c788-dd13-4076-91f5-d0c1f77038f4 subscribed to alerts","service":"black-codex","timestamp":"2025-12-14T03:34:23.447Z"}
+{"level":"info","message":"Client 73a2c788-dd13-4076-91f5-d0c1f77038f4 subscribed to scan","service":"black-codex","timestamp":"2025-12-14T03:34:23.448Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:33 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:33.395Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:43 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:43.967Z"}
+{"level":"info","message":"::1 - - [14/Dec/2025:03:34:53 +0000] \"GET /api/alerts HTTP/1.1\" 304 - \"http://localhost:8080/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"black-codex","timestamp":"2025-12-14T03:34:53.965Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"black-codex","timestamp":"2025-12-14T03:34:58.051Z"}
